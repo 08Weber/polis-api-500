@@ -23,6 +23,29 @@ export const API_URL = 'https://polisen.se/api/events';
 export const POLISEN_URL = 'https://polisen.se';
 export const TIME_ZONE = 'Europe/Stockholm';
 
+/** Länet som sidan utgår från, och dess kommuner. */
+export const HOME_COUNTY = 'Östergötlands län';
+export const HOME_MUNICIPALITIES = [
+  'Boxholm',
+  'Finspång',
+  'Kinda',
+  'Linköping',
+  'Mjölby',
+  'Motala',
+  'Norrköping',
+  'Söderköping',
+  'Vadstena',
+  'Valdemarsvik',
+  'Ydre',
+  'Åtvidaberg',
+  'Ödeshög',
+];
+
+/** API-adressen filtrerad på ett län, t.ex. countyUrl('Östergötlands län'). */
+export function countyUrl(county, base = API_URL) {
+  return `${base}?locationname=${encodeURIComponent(county)}`;
+}
+
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
@@ -294,14 +317,15 @@ export function normalizeEvents(data) {
 export const collator = new Intl.Collator('sv', { sensitivity: 'base', numeric: true });
 
 /**
- * Filtrera på fritext (alla ord måste finnas), län, typ och kategori.
+ * Filtrera på fritext (alla ord måste finnas), län, ort, typ och kategori.
  * Tomma filter ignoreras.
  */
-export function filterEvents(events, { q = '', county = '', type = '', category = '' } = {}) {
+export function filterEvents(events, { q = '', county = '', place = '', type = '', category = '' } = {}) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
   return events.filter(
     (event) =>
       (!county || event.county === county) &&
+      (!place || event.place === place) &&
       (!type || event.type === type) &&
       (!category || event.category === category) &&
       terms.every((term) => event.searchText.includes(term)),

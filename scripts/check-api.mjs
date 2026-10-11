@@ -6,6 +6,7 @@
  *   node scripts/check-api.mjs                     hämta live från polisen.se
  *   node scripts/check-api.mjs --file svar.json    kontrollera ett sparat svar
  *   node scripts/check-api.mjs --sample 5          skriv även ut 5 råa händelser
+ *   node scripts/check-api.mjs --lan "Östergötlands län"   bara händelser i ett län
  *   node scripts/check-api.mjs --url http://…      hämta från en annan adress (tester)
  *
  * Avslutas med kod 1 om något som sidan är beroende av inte stämmer.
@@ -18,6 +19,7 @@ import {
   categorize,
   categoryLabel,
   computeStats,
+  countyUrl,
   formatFull,
   isApiDateTime,
   normalizeEvents,
@@ -34,6 +36,7 @@ const { values: args } = parseArgs({
     origin: { type: 'string', default: 'https://08weber.github.io' },
     sample: { type: 'string', default: '0' },
     url: { type: 'string', default: API_URL },
+    lan: { type: 'string' },
     'retry-delay': { type: 'string', default: '20' },
   },
 });
@@ -58,12 +61,13 @@ function finish() {
 // API:et svarar ibland HTTP 200 med en tom lista en kort stund, så vi
 // försöker några gånger innan vi larmar.
 const ATTEMPTS = 4;
+const url = args.lan ? countyUrl(args.lan, args.url) : args.url;
 const RETRY_DELAY_MS = Number(args['retry-delay']) * 1000;
 
 async function fetchEvents() {
   const started = performance.now();
   try {
-    const response = await fetch(args.url, {
+    const response = await fetch(url, {
       headers: {
         Accept: 'application/json',
         Origin: args.origin,
@@ -82,7 +86,7 @@ if (args.file) {
   console.log(`Kontrollerar ${args.file}`);
   data = JSON.parse(await readFile(args.file, 'utf8'));
 } else {
-  console.log(`Hämtar ${args.url}  (Origin: ${args.origin})`);
+  console.log(`Hämtar ${url}  (Origin: ${args.origin})`);
   let result;
   let emptyAnswers = 0;
   for (let attempt = 1; attempt <= ATTEMPTS; attempt += 1) {
@@ -154,9 +158,20 @@ if (!Array.isArray(data)) {
   errors.push(`Svaret är inte en lista utan ${typeof data}.`);
   finish();
 }
-console.log(`\nAntal händelser: ${data.length} (dokumentationen anger 500)`);
+if (args.lan) {
+  console.log(`\nAntal händelser i ${args.lan}: ${data.length}`);
+  // Länsfiltret måste fungera, annars visar sidan fel län.
+  const outside = data.filter((event) => event?.location?.name !== args.lan);
+  if (outside.length) {
+    errors.push(`${outside.length} av ${data.length} händelser ligger utanför ${args.lan}: länsfiltret fungerar inte.`);
+  } else if (data.length) {
+    console.log(`Länsfilter: ok, alla ligger i ${args.lan}`);
+  }
+} else {
+  console.log(`\nAntal händelser: ${data.length} (dokumentationen anger 500)`);
+}
 if (data.length === 0) errors.push('API:et returnerade inga händelser.');
-else if (data.length < 400) warnings.push(`Bara ${data.length} händelser, dokumentationen anger 500.`);
+else if (!args.lan && data.length < 400) warnings.push(`Bara ${data.length} händelser, dokumentationen anger 500.`);
 
 // [fält, kontroll, kritiskt för sidan?]
 const checks = [

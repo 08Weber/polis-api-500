@@ -30,4 +30,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - run: node scripts/check-api.mjs --sample 3
+      - name: Hela Sverige
+        run: node scripts/check-api.mjs --sample 3
+      - name: Östergötland
+        run: node scripts/check-api.mjs --lan "Östergötlands län" --sample 3
