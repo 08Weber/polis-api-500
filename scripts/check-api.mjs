@@ -20,6 +20,7 @@ import {
   isApiDateTime,
   normalizeEvents,
   parseDateTime,
+  parseEventName,
   parseGps,
   relativeTime,
   toPolisenUrl,
@@ -124,6 +125,8 @@ const checks = [
   ['datetime (går att tolka)', (e) => parseDateTime(e.datetime) !== null, true],
   ['datetime (känt format)', (e) => isApiDateTime(e.datetime), false],
   ['name', (e) => typeof e.name === 'string' && e.name.length > 0, false],
+  ['name → händelsetid', (e) => parseEventName(e.name, e.type, parseDateTime(e.datetime)).date !== null, false],
+  ['name → ort', (e) => parseEventName(e.name, e.type, parseDateTime(e.datetime)).place !== null, false],
   ['summary', (e) => typeof e.summary === 'string', false],
   ['url (polisen.se)', (e) => toPolisenUrl(e.url) !== null, true],
   ['type', (e) => typeof e.type === 'string' && e.type.length > 0, true],
@@ -169,8 +172,22 @@ for (const [type, count] of [...types].sort((a, b) => b[1] - a[1])) {
   console.log(`  ${String(count).padStart(4)}  ${type.padEnd(36)} ${categoryLabel(categorize(type))}`);
 }
 
-const locations = new Set(events.map((event) => event.location));
-console.log(`\nPlatser: ${locations.size} st, t.ex. ${[...locations].slice(0, 8).join(', ')}`);
+// Sidans filter heter "Län", eftersom location.name numera alltid är ett län.
+const counties = new Set(events.map((event) => event.county));
+const places = new Set(events.map((event) => event.place));
+console.log(`\nLän: ${counties.size} st, orter: ${places.size} st (t.ex. ${[...places].slice(0, 6).join(', ')})`);
+const notCounty = [...counties].filter((county) => !county.endsWith(' län'));
+if (notCounty.length) {
+  warnings.push(`location.name är inte alltid ett län (t.ex. "${notCounty[0]}"), så län-filtret visar även orter.`);
+}
+
+const delays = events
+  .filter((event) => event.date && event.published)
+  .map((event) => (event.published - event.date) / 60_000)
+  .sort((a, b) => a - b);
+if (delays.length) {
+  console.log(`Tid från händelse till publicering: median ${Math.round(delays[delays.length >> 1])} min`);
+}
 
 const sampleSize = Number.parseInt(args.sample, 10) || 0;
 if (sampleSize > 0) {

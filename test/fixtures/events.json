@@ -1,92 +1,14 @@
 [
-  {
-    "id": 900010,
-    "datetime": "2026-10-11 2:13:45 +02:00",
-    "name": "11 oktober 02:13, Trafikolycka, Stockholm",
-    "summary": "Exempeldata för tester: två personbilar har kolliderat.",
-    "url": "/aktuellt/handelser/2026/oktober/11/11-oktober-02.13-trafikolycka-stockholm/",
-    "type": "Trafikolycka",
-    "location": { "name": "Stockholm", "gps": "59.329324,18.068581" }
-  },
-  {
-    "id": 900009,
-    "datetime": "2026-10-11 01:40:12 +02:00",
-    "name": "11 oktober 01:40, Misshandel, Göteborg",
-    "summary": "Exempeldata för tester: en man har blivit slagen utanför en restaurang.",
-    "url": "/aktuellt/handelser/2026/oktober/11/11-oktober-01.40-misshandel-goteborg/",
-    "type": "Misshandel",
-    "location": { "name": "Göteborg", "gps": "57.70887,11.97456" }
-  },
-  {
-    "id": 900008,
-    "datetime": "2026-10-11 00:05:00 +02:00",
-    "name": "11 oktober 00:05, Brand, Malmö",
-    "summary": "Exempeldata för tester: brand i en container.",
-    "url": "/aktuellt/handelser/2026/oktober/11/11-oktober-00.05-brand-malmo/",
-    "type": "Brand",
-    "location": { "name": "Malmö", "gps": "55.604981,13.003822" }
-  },
-  {
-    "id": 900007,
-    "datetime": "2026-10-10 23:58:30 +02:00",
-    "name": "10 oktober 23:58, Inbrott, Uppsala",
-    "summary": "Exempeldata för tester: inbrott i en villa.",
-    "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-23.58-inbrott-uppsala/",
-    "type": "Inbrott",
-    "location": { "name": "Uppsala", "gps": "59.858564,17.638927" }
-  },
-  {
-    "id": 900006,
-    "datetime": "2026-10-10 22:15:00 +02:00",
-    "name": "10 oktober 22:15, Sammanfattning kväll och natt, Västra Götalands län",
-    "summary": "Exempeldata för tester: sammanfattning av kvällen.",
-    "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-22.15-sammanfattning-kvall-och-natt-vastra-gotalands-lan/",
-    "type": "Sammanfattning kväll och natt",
-    "location": { "name": "Västra Götalands län", "gps": "58.252793,13.059643" }
-  },
-  {
-    "id": 900005,
-    "datetime": "2026-10-10 19:03:11 +02:00",
-    "name": "10 oktober 19:03, Rån, Stockholm",
-    "summary": "Exempeldata för tester: rån mot en butik.",
-    "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-19.03-ran-stockholm/",
-    "type": "Rån",
-    "location": { "name": "Stockholm", "gps": "59.329324,18.068581" }
-  },
-  {
-    "id": 900004,
-    "datetime": "2026-10-10 14:20:00 +02:00",
-    "name": "10 oktober 14:20, Trafikolycka, smitning från, Örebro",
-    "summary": "Exempeldata för tester: en bilist har kört från platsen.",
-    "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-14.20-trafikolycka-smitning-fran-orebro/",
-    "type": "Trafikolycka, smitning från",
-    "location": { "name": "Örebro", "gps": "59.275263,15.213411" }
-  },
-  {
-    "id": 900003,
-    "datetime": "2026-10-09 09:12:00 +02:00",
-    "name": "09 oktober 09:12, Försvunnen person, Kiruna",
-    "summary": "Exempeldata för tester: en person har anmälts försvunnen.",
-    "url": "/aktuellt/handelser/2026/oktober/9/09-oktober-09.12-forsvunnen-person-kiruna/",
-    "type": "Försvunnen person",
-    "location": { "name": "Kiruna", "gps": "67.85572,20.225282" }
-  },
-  {
-    "id": 900002,
-    "datetime": "2026-10-09 08:00:00 +02:00",
-    "name": "09 oktober 08:00, Motorfordon, stöld, Lund",
-    "summary": "Exempeldata för tester: en bil har stulits.",
-    "url": "/aktuellt/handelser/2026/oktober/9/09-oktober-08.00-motorfordon-stold-lund/",
-    "type": "Motorfordon, stöld",
-    "location": { "name": "Lund", "gps": "55.70466,13.191007" }
-  },
-  {
-    "id": 900001,
-    "datetime": "2026-10-09 07:30:00 +02:00",
-    "name": "09 oktober 07:30, Skottlossning, misstänkt, Södertälje",
-    "summary": "Exempeldata för tester: misstänkta skott har hörts.",
-    "url": "/aktuellt/handelser/2026/oktober/9/09-oktober-07.30-skottlossning-misstankt-sodertalje/",
-    "type": "Skottlossning, misstänkt",
-    "location": { "name": "Södertälje", "gps": "59.19554,17.625168" }
-  }
+  {"id":655837,"datetime":"2026-10-10 22:06:24 +02:00","name":"10 oktober 21.35, Brand, Huddinge","summary":"Polis och räddningstjänst är på plats vid en byggnad i Snättringe i vilken det brinner.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-21.35-brand-huddinge/","type":"Brand","location":{"name":"Stockholms län","gps":"59.602496,18.138438"}},
+  {"id":655836,"datetime":"2026-10-10 21:46:59 +02:00","name":"10 oktober 21.45, Övrigt, Hallands län","summary":"Efter klockan 22:00 finns ingen presstalesperson i tjänst. Frågor från media besvaras av befäl på ledningscentralen i mån av tid.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-21.45-ovrigt-hallands-lan/","type":"Övrigt","location":{"name":"Hallands län","gps":"56.896681,12.803399"}},
+  {"id":655834,"datetime":"2026-10-10 21:04:16 +02:00","name":"10 oktober 20.29, Trafikbrott, Ängelholm","summary":"En motorcykel stoppas efter förföljande.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-20.29-trafikbrott-angelholm/","type":"Trafikbrott","location":{"name":"Skåne län","gps":"55.990257,13.595769"}},
+  {"id":655832,"datetime":"2026-10-10 20:17:39 +02:00","name":"10 oktober 20.06, Trafikolycka, singel, Perstorp","summary":"Personbil i mitträcket på riksväg 21, strax öster om Perstorp.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-20.06-trafikolycka-singel-perstorp/","type":"Trafikolycka, singel","location":{"name":"Skåne län","gps":"55.990257,13.595769"}},
+  {"id":655833,"datetime":"2026-10-10 20:49:50 +02:00","name":"10 oktober 19.41, Rattfylleri, Torsås","summary":"Man frihetsberövad efter nykterhetskontroll.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-19.41-rattfylleri-torsas/","type":"Rattfylleri","location":{"name":"Kalmar län","gps":"57.235016,16.184935"}},
+  {"id":655827,"datetime":"2026-10-10 17:24:39 +02:00","name":"10 oktober 17.22, Trafikhinder, Stockholm","summary":"En person promenerar på Essingeleden i h m Lilla Essingen. Han går i nordlig riktning i den södergående filen. Han orsakar inbromsningar.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-17.22-trafikhinder-stockholm/","type":"Trafikhinder","location":{"name":"Stockholms län","gps":"59.602496,18.138438"}},
+  {"id":655818,"datetime":"2026-10-10 14:06:01 +02:00","name":"10 oktober 11.32, Stöld, Skellefteå","summary":"Skellefteå, man misstänkt för ringa stöld.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-11.32-stold-skelleftea/","type":"Stöld","location":{"name":"Västerbottens län","gps":"65.333731,16.516169"}},
+  {"id":655815,"datetime":"2026-10-10 13:40:43 +02:00","name":"10 oktober 13.36, Vållande till kroppsskada, Jönköping","summary":"Kvinna biten av hund.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-13.36-vallande-till-kroppsskada-jonkoping/","type":"Vållande till kroppsskada","location":{"name":"Jönköpings län","gps":"57.370843,14.343917"}},
+  {"id":655809,"datetime":"2026-10-10 11:38:39 +02:00","name":"10 oktober 11.38, Misshandel, Östersund","summary":"Östersund, man anhållen misstänkt för bland annat misshandel.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-11.38-misshandel-ostersund/","type":"Misshandel","location":{"name":"Jämtlands län","gps":"63.171192,14.95918"}},
+  {"id":655805,"datetime":"2026-10-10 10:38:04 +02:00","name":"10 oktober 10.35, Rattfylleri, Ludvika","summary":"Polispatrull har stoppat rattfull bilist.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-10.35-rattfylleri-ludvika/","type":"Rattfylleri","location":{"name":"Dalarnas län","gps":"61.091701,14.666365"}},
+  {"id":655802,"datetime":"2026-10-10 8:29:23 +02:00","name":"10 oktober 08.16, Trafikolycka, Uppsala","summary":"Bil har kört in i mitträcket på E4.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-08.16-trafikolycka-uppsala/","type":"Trafikolycka","location":{"name":"Uppsala län","gps":"60.009226,17.271459"}},
+  {"id":655788,"datetime":"2026-10-10 7:44:49 +02:00","name":"10 oktober 07.44, Sammanfattning natt, Jönköpings län","summary":"Sammanfattning av nattens händelser.","url":"/aktuellt/handelser/2026/oktober/10/10-oktober-07.44-sammanfattning-natt-jonkopings-lan/","type":"Sammanfattning natt","location":{"name":"Jönköpings län","gps":"57.370843,14.343917"}}
 ]

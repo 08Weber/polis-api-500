@@ -6,6 +6,17 @@
  *
  * Dokumentation:
  * https://polisen.se/om-polisen/om-webbplatsen/oppna-data/api-over-polisens-handelser/
+ *
+ * Så ser en händelse ut (oktober 2026):
+ *   {
+ *     "id": 655837,
+ *     "datetime": "2026-10-10 22:06:24 +02:00",       ← när notisen publicerades
+ *     "name": "10 oktober 21.35, Brand, Huddinge",     ← händelsetid, typ och ort
+ *     "summary": "Polis och räddningstjänst är på plats …",
+ *     "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-21.35-brand-huddinge/",
+ *     "type": "Brand",
+ *     "location": { "name": "Stockholms län", "gps": "59.602496,18.138438" }  ← länet
+ *   }
  */
 
 export const API_URL = 'https://polisen.se/api/events';
@@ -17,18 +28,22 @@ const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 /* ------------------------------------------------------------------ */
-/* Tolkning av API-fälten                                              */
+/* Tid                                                                 */
 /* ------------------------------------------------------------------ */
 
-// API:et skickar t.ex. "2026-10-11 2:13:45 +02:00" – mellanslag i stället
-// för "T" och ibland timmen utan inledande nolla. Det formatet klarar inte
-// alla webbläsare (t.ex. Safari) med new Date(), så vi tolkar det själva.
+// "datetime" ser ut som "2026-10-10 7:44:49 +02:00": mellanslag i stället för
+// "T" och ibland timmen utan inledande nolla. Det klarar inte alla webbläsare
+// (t.ex. Safari) med new Date(), så vi tolkar det själva.
 const DATETIME_RE =
   /^(\d{4})-(\d{1,2})-(\d{1,2})[ T](\d{1,2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?\s*(Z|[+-]\d{2}:?\d{2})?$/i;
 
 /** Matchar värdet API:ets kända datumformat? */
 export function isApiDateTime(value) {
   return typeof value === 'string' && DATETIME_RE.test(value.trim());
+}
+
+function validParts(month, day, hour, minute, second = 0) {
+  return month >= 0 && month <= 11 && day >= 1 && day <= 31 && hour <= 23 && minute <= 59 && second <= 59;
 }
 
 /** "2026-10-11 02:13:45 +02:00" → Date, eller null om det inte går att tolka. */
@@ -43,23 +58,96 @@ export function parseDateTime(value) {
 
   const [, y, mo, d, h, mi, s = '0', zone] = match;
   const parts = [+y, +mo - 1, +d, +h, +mi, +s];
-  if (parts[1] < 0 || parts[1] > 11 || parts[2] < 1 || parts[2] > 31 || parts[3] > 23 || parts[4] > 59 || parts[5] > 59) {
-    return null;
+  if (!validParts(...parts.slice(1))) return null;
+
+  if (!zone) return fromStockholmTime(...parts);
+  let time = Date.UTC(...parts);
+  if (zone.toUpperCase() !== 'Z') {
+    const sign = zone[0] === '-' ? -1 : 1;
+    const digits = zone.slice(1).replace(':', '');
+    time -= sign * (+digits.slice(0, 2) * 60 + +digits.slice(2)) * MINUTE;
+  }
+  return new Date(time);
+}
+
+const zoneFormat = new Intl.DateTimeFormat('en-US', {
+  timeZone: TIME_ZONE,
+  hourCycle: 'h23',
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+});
+
+/** Hur många ms svensk tid ligger före UTC vid en viss tidpunkt (1 eller 2 timmar). */
+function stockholmOffset(time) {
+  const whole = Math.floor(time / 1000) * 1000;
+  const p = {};
+  for (const { type, value } of zoneFormat.formatToParts(new Date(whole))) p[type] = +value;
+  return Date.UTC(p.year, p.month - 1, p.day, p.hour % 24, p.minute, p.second) - whole;
+}
+
+/** Svensk lokal tid (månad 0–11) → Date, med hänsyn till sommartid. */
+export function fromStockholmTime(year, month, day, hour, minute, second = 0) {
+  const local = Date.UTC(year, month, day, hour, minute, second);
+  const guess = local - stockholmOffset(local);
+  return new Date(local - stockholmOffset(guess));
+}
+
+/* ------------------------------------------------------------------ */
+/* Rubriken: "10 oktober 21.35, Brand, Huddinge"                       */
+/* ------------------------------------------------------------------ */
+
+const MONTHS = [
+  'januari',
+  'februari',
+  'mars',
+  'april',
+  'maj',
+  'juni',
+  'juli',
+  'augusti',
+  'september',
+  'oktober',
+  'november',
+  'december',
+];
+const NAME_RE = /^(\d{1,2}) ([a-zåäö]+) (\d{1,2})[.:](\d{2}),\s*(.+)$/i;
+
+/**
+ * Plockar ut händelsetid och ort ur rubriken. Rubriken saknar år, så året tas
+ * från publiceringstiden (en händelse 31 december kan publiceras 1 januari).
+ */
+export function parseEventName(name, type, published) {
+  const result = { date: null, place: null };
+  const match = NAME_RE.exec(typeof name === 'string' ? name.trim() : '');
+  if (!match) return result;
+
+  const [, d, monthName, h, mi, rest] = match;
+  const month = MONTHS.indexOf(monthName.toLowerCase());
+  if (validParts(month, +d, +h, +mi)) {
+    const reference = published ?? new Date();
+    const year = +dayKey(reference).slice(0, 4);
+    let date = fromStockholmTime(year, month, +d, +h, +mi);
+    if (date - reference > 180 * DAY) date = fromStockholmTime(year - 1, month, +d, +h, +mi);
+    else if (reference - date > 180 * DAY) date = fromStockholmTime(year + 1, month, +d, +h, +mi);
+    result.date = date;
   }
 
-  let time;
-  if (!zone) {
-    time = new Date(...parts).getTime();
-  } else {
-    time = Date.UTC(...parts);
-    if (zone.toUpperCase() !== 'Z') {
-      const sign = zone[0] === '-' ? -1 : 1;
-      const digits = zone.slice(1).replace(':', '');
-      time -= sign * (+digits.slice(0, 2) * 60 + +digits.slice(2)) * MINUTE;
-    }
-  }
-  return Number.isNaN(time) ? null : new Date(time);
+  // Det som står efter typen är orten. Typen kan själv innehålla kommatecken
+  // ("Trafikolycka, singel"), så vi letar efter just den typen först.
+  let place = null;
+  if (type && rest.startsWith(`${type},`)) place = rest.slice(type.length + 1);
+  else if (rest.includes(',')) place = rest.slice(rest.lastIndexOf(',') + 1);
+  result.place = place?.trim() || null;
+  return result;
 }
+
+/* ------------------------------------------------------------------ */
+/* Övriga fält                                                         */
+/* ------------------------------------------------------------------ */
 
 /** "59.329324,18.068581" → { lat, lng }, eller null. */
 export function parseGps(value) {
@@ -73,7 +161,7 @@ export function parseGps(value) {
 }
 
 /**
- * API:et ger relativa länkar ("/aktuellt/handelser/2026/oktober/11/...").
+ * API:et ger relativa länkar ("/aktuellt/handelser/2026/oktober/10/...").
  * Gör om till absolut https-länk och släpp bara igenom polisen.se.
  */
 export function toPolisenUrl(value) {
@@ -90,12 +178,19 @@ export function toPolisenUrl(value) {
   return url.protocol === 'https:' ? url.href : null;
 }
 
-/** Länk till OpenStreetMap för en koordinat. */
-export function mapUrl(gps, zoom = 11) {
+/**
+ * Kartlänk till OpenStreetMap. API:ets koordinat är länets mittpunkt, så vi
+ * söker hellre på orten och faller tillbaka på koordinaten.
+ */
+export function mapUrl({ place, county, gps }) {
+  if (place) {
+    const query = place === county || !county ? place : `${place}, ${county}`;
+    return `https://www.openstreetmap.org/search?query=${encodeURIComponent(query)}`;
+  }
   if (!gps) return null;
   const lat = gps.lat.toFixed(5);
   const lng = gps.lng.toFixed(5);
-  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=${zoom}/${lat}/${lng}`;
+  return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}#map=9/${lat}/${lng}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -112,17 +207,18 @@ export const CATEGORIES = [
 ];
 
 // Första regeln som matchar vinner, så ordningen spelar roll:
-// "Trafikolycka" ska bli trafik (inte olycka) och "Motorfordon, stöld" stöld.
-// Nyckelord i stället för en fast lista, så att nya händelsetyper ändå hamnar rätt.
+// "Trafikolycka" ska bli trafik (inte olycka), "Motorfordon, stöld" stöld
+// och "Mordbrand" brand. Nyckelord i stället för en fast lista, så att nya
+// händelsetyper ändå hamnar rätt.
 const CATEGORY_RULES = [
   ['sammanfattning', /^(sammanfattning|uppdatering)/],
   ['stold', /stöld|stulet|inbrott|häleri|snatteri|skadegörelse|bedrägeri|förfalskning|urkund|ekobrott|intrång|hemfrid/],
   ['trafik', /trafik|rattfylleri|olovlig körning|motorfordon/],
+  ['brand', /brand|olycka|olycksfall|räddning|drunkn|naturkatastrof|haveri|varningslarm|kemikalie|översvämning/],
   [
     'vald',
     /mord|dråp|misshandel|(^|[^a-zåäö])rån|skottlossning|skjutning|detonation|sprängning|explosion|bombhot|våld|olaga hot|frihetsberövande|knivlag|vapenlag|överfall|bråk|ofredande|sedlighet|sexualbrott|kroppsskada|farligt föremål/,
   ],
-  ['brand', /brand|olycka|olycksfall|räddning|drunkn|naturkatastrof|haveri|varningslarm|kemikalie|översvämning/],
 ];
 
 /** Händelsetyp ("Trafikolycka, personskada") → kategori-id ("trafik"). */
@@ -150,25 +246,35 @@ function text(value) {
 export function normalizeEvent(raw) {
   if (!raw || typeof raw !== 'object') return null;
 
-  const date = parseDateTime(raw.datetime);
   const type = text(raw.type) || 'Händelse';
-  const location = text(raw.location?.name) || 'Okänd plats';
+  const county = text(raw.location?.name);
   const title = text(raw.name);
   const summary = text(raw.summary);
+  const published = parseDateTime(raw.datetime);
+  const fromName = parseEventName(title, type, published);
+  const date = fromName.date ?? published;
+  const place = fromName.place ?? county;
 
   return {
     id: String(raw.id ?? `${raw.datetime}|${title}`),
-    date,
+    date, // när det hände (ur rubriken), annars publiceringstiden
     time: date ? date.getTime() : Number.NaN,
+    published,
     type,
     category: categorize(type),
-    location,
+    place: place || 'Okänd plats', // orten, t.ex. "Huddinge"
+    county: county || place || 'Okänd plats', // länet, t.ex. "Stockholms län"
     title,
     summary,
     url: toPolisenUrl(raw.url),
     gps: parseGps(raw.location?.gps),
-    searchText: `${type} ${location} ${title} ${summary}`.toLowerCase(),
+    searchText: `${type} ${place} ${county} ${title} ${summary}`.toLowerCase(),
   };
+}
+
+function byNewest(a, b) {
+  const time = (event) => (Number.isFinite(event.time) ? event.time : -Infinity);
+  return time(b) - time(a) || (b.published?.getTime() ?? 0) - (a.published?.getTime() ?? 0) || collator.compare(b.id, a.id);
 }
 
 /** Hela API-svaret → normaliserade händelser, nyast först. */
@@ -176,11 +282,7 @@ export function normalizeEvents(data) {
   if (!Array.isArray(data)) {
     throw new TypeError('Oväntat svar från Polisens API: förväntade en lista med händelser.');
   }
-  const sortTime = (event) => (Number.isFinite(event.time) ? event.time : -Infinity);
-  return data
-    .map(normalizeEvent)
-    .filter(Boolean)
-    .sort((a, b) => sortTime(b) - sortTime(a));
+  return data.map(normalizeEvent).filter(Boolean).sort(byNewest);
 }
 
 /* ------------------------------------------------------------------ */
@@ -190,14 +292,14 @@ export function normalizeEvents(data) {
 export const collator = new Intl.Collator('sv', { sensitivity: 'base', numeric: true });
 
 /**
- * Filtrera på fritext (alla ord måste finnas), plats, typ och kategori.
+ * Filtrera på fritext (alla ord måste finnas), län, typ och kategori.
  * Tomma filter ignoreras.
  */
-export function filterEvents(events, { q = '', location = '', type = '', category = '' } = {}) {
+export function filterEvents(events, { q = '', county = '', type = '', category = '' } = {}) {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
   return events.filter(
     (event) =>
-      (!location || event.location === location) &&
+      (!county || event.county === county) &&
       (!type || event.type === type) &&
       (!category || event.category === category) &&
       terms.every((term) => event.searchText.includes(term)),
@@ -213,33 +315,43 @@ export function countValues(events, key) {
     .sort((a, b) => collator.compare(a.value, b.value));
 }
 
+function mostCommon(counts) {
+  let top = null;
+  for (const [value, count] of counts) {
+    if (!top || count > top.count) top = { value, count };
+  }
+  return top;
+}
+
 export function computeStats(events, now = Date.now()) {
   let lastHour = 0;
   let lastDay = 0;
   let newest = null;
   let oldest = null;
-  const typeCounts = new Map();
+  const types = new Map();
+  const counties = new Map();
 
   for (const event of events) {
+    counties.set(event.county, (counties.get(event.county) ?? 0) + 1);
+    // Sammanfattningar är inte händelser i sig.
+    if (event.category !== 'sammanfattning') types.set(event.type, (types.get(event.type) ?? 0) + 1);
     if (!event.date) continue;
     const age = now - event.time;
     if (age < HOUR) lastHour += 1;
-    if (age < DAY) {
-      lastDay += 1;
-      if (event.category !== 'sammanfattning') {
-        typeCounts.set(event.type, (typeCounts.get(event.type) ?? 0) + 1);
-      }
-    }
+    if (age < DAY) lastDay += 1;
     if (!newest || event.time > newest.getTime()) newest = event.date;
     if (!oldest || event.time < oldest.getTime()) oldest = event.date;
   }
 
-  let topType = null;
-  for (const [type, count] of typeCounts) {
-    if (!topType || count > topType.count) topType = { type, count };
-  }
-
-  return { total: events.length, lastHour, lastDay, topType, newest, oldest };
+  return {
+    total: events.length,
+    lastHour,
+    lastDay,
+    newest,
+    oldest,
+    topType: mostCommon(types),
+    topCounty: mostCommon(counties),
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -253,6 +365,7 @@ const dayKeyFormat = new Intl.DateTimeFormat('sv-SE', {
   month: '2-digit',
   day: '2-digit',
 });
+const shortDateFormat = new Intl.DateTimeFormat('sv-SE', { timeZone: TIME_ZONE, day: 'numeric', month: 'short' });
 const fullFormat = new Intl.DateTimeFormat('sv-SE', { timeZone: TIME_ZONE, dateStyle: 'long', timeStyle: 'short' });
 const relativeFormat = new Intl.RelativeTimeFormat('sv', { numeric: 'auto' });
 
@@ -261,7 +374,12 @@ export function formatClock(date) {
   return clockFormat.format(date);
 }
 
-/** "11 oktober 2026 14:32" */
+/** "10 okt." */
+export function formatShortDate(date) {
+  return shortDateFormat.format(date);
+}
+
+/** "11 oktober 2026 kl. 14:32" */
 export function formatFull(date) {
   return fullFormat.format(date);
 }
