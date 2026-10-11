@@ -1,0 +1,15 @@
+{
+  "name": "Utryckning LKPG",
+  "short_name": "Utryckning",
+  "description": "Polisens senaste händelser i Östergötland, live från Polisens öppna data.",
+  "lang": "sv",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a1b44",
+  "theme_color": "#0a1b44",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

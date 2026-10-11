@@ -350,6 +350,7 @@ function mostCommon(counts) {
 export function computeStats(events, now = Date.now()) {
   let lastHour = 0;
   let lastDay = 0;
+  let lastWeek = 0;
   let newest = null;
   let oldest = null;
   const types = new Map();
@@ -366,6 +367,7 @@ export function computeStats(events, now = Date.now()) {
     const age = now - event.time;
     if (age < HOUR) lastHour += 1;
     if (age < DAY) lastDay += 1;
+    if (age < 7 * DAY) lastWeek += 1;
     if (!newest || event.time > newest.getTime()) newest = event.date;
     if (!oldest || event.time < oldest.getTime()) oldest = event.date;
   }
@@ -374,6 +376,7 @@ export function computeStats(events, now = Date.now()) {
     total: events.length,
     lastHour,
     lastDay,
+    lastWeek,
     newest,
     oldest,
     topType: mostCommon(types),

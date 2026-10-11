@@ -3,18 +3,20 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Polishändelser – de senaste 500 i Sverige</title>
+    <title>Utryckning LKPG – polishändelser i Östergötland</title>
     <meta
       name="description"
-      content="Polisens 500 senaste händelser i hela Sverige, direkt från Polisens öppna API. Sök och filtrera på län, typ och kategori."
+      content="Polisens senaste händelser i Linköping, Norrköping och hela Östergötland, live från Polisens öppna data. Med notiser vid nya händelser och hela Sverige som tillval."
     />
     <meta name="theme-color" content="#0a1b44" />
-    <meta property="og:title" content="Polishändelser – de senaste 500 i Sverige" />
+    <meta property="og:title" content="Utryckning LKPG" />
     <meta
       property="og:description"
-      content="Polisens senaste händelser i hela Sverige, live från Polisens öppna API."
+      content="Polisens senaste händelser i Östergötland, live från Polisens öppna data."
     />
     <meta property="og:type" content="website" />
+    <meta name="apple-mobile-web-app-title" content="Utryckning LKPG" />
+    <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
     <link rel="preload" href="fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin />
@@ -135,13 +137,33 @@
         <path d="M18 6 6 18" />
         <path d="m6 6 12 12" />
       </symbol>
+      <symbol id="i-bell" viewBox="0 0 24 24">
+        <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+        <path
+          d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
+        />
+      </symbol>
+      <symbol id="i-bell-ring" viewBox="0 0 24 24">
+        <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+        <path d="M22 8c0-2.3-.8-4.3-2-6" />
+        <path
+          d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"
+        />
+        <path d="M4 2C2.8 3.7 2 5.7 2 8" />
+      </symbol>
+      <symbol id="i-bell-off" viewBox="0 0 24 24">
+        <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+        <path d="M17 17H4a1 1 0 0 1-.74-1.673C4.59 13.956 6 12.499 6 8a6 6 0 0 1 .258-1.742" />
+        <path d="m2 2 20 20" />
+        <path d="M8.668 3.01A6 6 0 0 1 18 8c0 2.687.77 4.653 1.707 6.05" />
+      </symbol>
     </svg>
 
     <a class="skip-link" href="#handelser">Hoppa till händelserna</a>
 
     <header class="masthead">
       <div class="masthead__inner wrap">
-        <a class="brand" href="./"><span class="brand__polis">Polis</span><span class="brand__rest">händelser</span></a>
+        <a class="brand" href="./"><span class="brand__polis">Utryckning</span><span class="brand__rest">LKPG</span></a>
         <p class="live" id="live" role="status" data-state="loading">
           <span class="live__lights" aria-hidden="true"><span></span><span></span></span>
           <span class="live__label" id="live-label">Hämtar händelser…</span>
@@ -151,18 +173,49 @@
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-refresh" /></svg>
             <span class="btn__text">Uppdatera</span>
           </button>
-          <button class="icon-btn" id="theme" type="button" aria-label="Byt färgtema">
+          <button
+            class="icon-btn notify-button"
+            id="notify-button"
+            type="button"
+            aria-label="Notiser"
+            aria-expanded="false"
+            aria-controls="notify-panel"
+            data-state="off"
+          >
+            <svg class="icon icon--bell" aria-hidden="true" focusable="false"><use href="#i-bell" /></svg>
+            <svg class="icon icon--bell-ring" aria-hidden="true" focusable="false"><use href="#i-bell-ring" /></svg>
+            <svg class="icon icon--bell-off" aria-hidden="true" focusable="false"><use href="#i-bell-off" /></svg>
+          </button>
+          <button class="icon-btn theme-button" id="theme" type="button" aria-label="Byt färgtema">
             <svg class="icon icon--sun" aria-hidden="true" focusable="false"><use href="#i-sun" /></svg>
             <svg class="icon icon--moon" aria-hidden="true" focusable="false"><use href="#i-moon" /></svg>
           </button>
+
+          <section class="notify-panel" id="notify-panel" aria-labelledby="notify-title" hidden>
+            <h2 class="notify-panel__title" id="notify-title">Notiser</h2>
+            <p class="notify-panel__text">Få en notis när Polisen publicerar en ny händelse i Östergötland.</p>
+            <label class="switch">
+              <input class="switch__input" id="notify-on" type="checkbox" role="switch" />
+              <span class="switch__track" aria-hidden="true"></span>
+              <span class="switch__label">Notiser vid nya händelser</span>
+            </label>
+            <label class="field__label" for="notify-area">Område</label>
+            <select class="select" id="notify-area"></select>
+            <button class="btn btn--outline" id="notify-test" type="button">Skicka en testnotis</button>
+            <p class="notify-panel__status" id="notify-status" role="status"></p>
+            <p class="notify-panel__hint">
+              Notiserna kommer medan sidan är öppen, även i en flik i bakgrunden. Sammanfattningar skickas inte.
+            </p>
+          </section>
         </div>
 
         <div class="hero">
           <div class="hero__intro">
-            <p class="hero__eyebrow">Inofficiell sida · Polisens öppna data · Hela Sverige</p>
-            <h1 class="hero__title">Lägesbild Sverige</h1>
+            <p class="hero__eyebrow">Inofficiell sida · Polisens öppna data · Östergötland</p>
+            <h1 class="hero__title" id="hero-title">Lägesbild Östergötland</h1>
             <p class="hero__lede">
-              De 500 senaste händelsenotiserna från Polisen, live. Sök och filtrera på län, typ och kategori.
+              Polisens senaste händelser i Linköping, Norrköping och resten av Östergötland, med notiser om du vill.
+              Hela Sverige finns som tillval.
             </p>
             <p class="hero__sos">
               <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-phone" /></svg>
@@ -304,6 +357,20 @@
     <main class="layout wrap" id="handelser">
       <aside class="filters" aria-label="Filter">
         <form class="filters__form" id="filters" role="search">
+          <fieldset class="field">
+            <legend class="field__label">Område</legend>
+            <div class="segmented">
+              <label class="segmented__option">
+                <input type="radio" name="omrade" value="ostergotland" checked />
+                <span>Östergötland</span>
+              </label>
+              <label class="segmented__option">
+                <input type="radio" name="omrade" value="sverige" />
+                <span>Hela Sverige</span>
+              </label>
+            </div>
+          </fieldset>
+
           <div class="field">
             <label class="field__label" for="q">Sök</label>
             <div class="search">
@@ -323,9 +390,9 @@
 
           <div class="field-row">
             <div class="field">
-              <label class="field__label" for="county">Län</label>
-              <select class="select" id="county" name="lan">
-                <option value="">Hela Sverige</option>
+              <label class="field__label" for="location" id="location-label">Ort</label>
+              <select class="select" id="location" name="plats">
+                <option value="">Hela Östergötland</option>
               </select>
             </div>
             <div class="field">
@@ -399,10 +466,13 @@
         <div>
           <p class="site-footer__brand">
             <span class="brand brand--small"
-              ><span class="brand__polis">Polis</span><span class="brand__rest">händelser</span></span
+              ><span class="brand__polis">Utryckning</span><span class="brand__rest">LKPG</span></span
             >
           </p>
-          <p>En inofficiell hobbysida som visar Polisens öppna data. Sidan har ingen koppling till Polisen.</p>
+          <p>
+            En inofficiell hobbysida som visar Polisens öppna data för Östergötland och resten av Sverige. Sidan har
+            ingen koppling till Polisen.
+          </p>
         </div>
         <div>
           <h2 class="site-footer__title">Om datan</h2>
@@ -428,7 +498,7 @@
       </div>
       <div class="wrap">
         <p class="site-footer__credit">
-          Gjord av @millew08 · <a href="https://github.com/08Weber/polis-api-500">Källkod på GitHub</a>
+          Made by Mille Weber · <a href="https://github.com/08Weber/polis-api-500">Källkod på GitHub</a>
         </p>
       </div>
     </footer>

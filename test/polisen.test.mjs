@@ -4,9 +4,13 @@ import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import {
+  API_URL,
+  HOME_COUNTY,
+  HOME_MUNICIPALITIES,
   categorize,
   computeStats,
   countValues,
+  countyUrl,
   dayKey,
   dayLabel,
   filterEvents,
@@ -266,6 +270,17 @@ test('filterEvents', () => {
   assert.deepEqual(ids(filterEvents(events, { q: 'rattfull ludvika' })), ['655805']);
   assert.deepEqual(ids(filterEvents(events, { q: 'östersund' })), ['655809']);
   assert.deepEqual(ids(filterEvents(events, { q: 'Huddinge', county: 'Skåne län' })), []);
+  // Ort (kommun) är det som skiljer händelser åt inom ett län.
+  assert.deepEqual(ids(filterEvents(events, { place: 'Perstorp' })), ['655832']);
+  assert.deepEqual(ids(filterEvents(events, { county: 'Skåne län', place: 'Ängelholm' })), ['655834']);
+});
+
+test('Östergötland: länsadress och kommuner', () => {
+  assert.equal(HOME_COUNTY, 'Östergötlands län');
+  assert.equal(countyUrl(HOME_COUNTY), `${API_URL}?locationname=%C3%96sterg%C3%B6tlands%20l%C3%A4n`);
+  assert.equal(countyUrl('Skåne län', 'http://127.0.0.1/x'), 'http://127.0.0.1/x?locationname=Sk%C3%A5ne%20l%C3%A4n');
+  assert.equal(HOME_MUNICIPALITIES.length, 13);
+  assert.ok(HOME_MUNICIPALITIES.includes('Linköping') && HOME_MUNICIPALITIES.includes('Norrköping'));
 });
 
 test('countValues sorterar i svensk bokstavsordning (å, ä, ö sist)', () => {
@@ -284,6 +299,8 @@ test('computeStats', () => {
   assert.equal(stats.total, 12);
   assert.equal(stats.lastHour, 2); // 21.45 och 21.35
   assert.equal(stats.lastDay, 12);
+  assert.equal(stats.lastWeek, 12);
+  assert.equal(computeStats(events, now + 8 * 86_400_000).lastWeek, 0);
   assert.equal(iso(stats.newest), '2026-10-10T19:45:00.000Z');
   assert.equal(iso(stats.oldest), '2026-10-10T05:44:00.000Z');
   assert.deepEqual(stats.topType, { value: 'Rattfylleri', count: 2 });

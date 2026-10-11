@@ -1,7 +1,7 @@
 {
   "name": "polis-api-500",
   "private": true,
-  "description": "Polisens senaste 500 händelser i Sverige, live från Polisens öppna API.",
+  "description": "Utryckning LKPG – Polisens händelser i Östergötland, live från Polisens öppna API.",
   "type": "module",
   "scripts": {
     "start": "npx --yes http-server -c-1 -p 8080 .",

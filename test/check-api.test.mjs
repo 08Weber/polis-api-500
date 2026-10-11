@@ -65,3 +65,20 @@ test('larmar om CORS-headern saknas', async () => {
     assert.match(stdout, /FEL: CORS/);
   });
 });
+
+test('--lan godkänner när alla händelser ligger i länet', async () => {
+  const skane = JSON.stringify(JSON.parse(fixture).filter((event) => event.location.name === 'Skåne län'));
+  await withServer([{ body: skane }], async (url) => {
+    const { code, stdout } = await runCheck(['--url', url, '--lan', 'Skåne län']);
+    assert.equal(code, 0, stdout);
+    assert.match(stdout, /Länsfilter: ok/);
+  });
+});
+
+test('--lan larmar om länsfiltret släpper igenom andra län', async () => {
+  await withServer([{ body: fixture }], async (url) => {
+    const { code, stdout } = await runCheck(['--url', url, '--lan', 'Skåne län']);
+    assert.equal(code, 1);
+    assert.match(stdout, /länsfiltret fungerar inte/);
+  });
+});

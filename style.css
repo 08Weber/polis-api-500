@@ -414,8 +414,145 @@ select {
 
 .masthead__actions {
   grid-area: actions;
+  position: relative;
   display: flex;
   gap: 8px;
+}
+
+/* Notiser: klockan visar om notiser är på, av eller blockerade */
+.notify-button {
+  position: relative;
+}
+.notify-button .icon--bell-ring,
+.notify-button .icon--bell-off,
+.notify-button[data-state='on'] .icon--bell,
+.notify-button[data-state='blocked'] .icon--bell {
+  display: none;
+}
+.notify-button[data-state='on'] .icon--bell-ring,
+.notify-button[data-state='blocked'] .icon--bell-off {
+  display: block;
+}
+.notify-button[data-state='on'] {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+.notify-button[aria-expanded='true'] {
+  background: rgb(255 255 255 / 0.16);
+}
+
+.notify-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  gap: 10px;
+  width: min(340px, calc(100vw - 2 * var(--gutter)));
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: 0 18px 50px -12px rgb(5 14 38 / 0.55);
+  color: var(--text);
+  text-align: left;
+}
+.notify-panel :focus-visible {
+  outline-color: var(--focus);
+}
+.notify-panel__title {
+  margin: 0;
+  font: 700 1.375rem/1.1 var(--font-display);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.notify-panel__text,
+.notify-panel__hint,
+.notify-panel__status {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+.notify-panel__hint {
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+.notify-panel__status:empty {
+  display: none;
+}
+.notify-panel__status {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  font-size: 0.875rem;
+}
+.notify-panel .field__label {
+  margin-top: 4px;
+}
+.notify-panel .btn {
+  justify-self: start;
+}
+.notify-panel .btn:disabled,
+.notify-panel .select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Reglage (på/av) */
+.switch {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface-2);
+  font-weight: 600;
+  cursor: pointer;
+}
+.switch__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+.switch__track {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  transition: background-color 0.15s;
+}
+.switch__track::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+  transition: transform 0.15s;
+}
+.switch__input:checked + .switch__track {
+  background: var(--police-blue);
+}
+.switch__input:checked + .switch__track::after {
+  transform: translateX(18px);
+}
+.switch__input:focus-visible + .switch__track {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.switch:has(.switch__input:disabled) {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .live {
@@ -871,6 +1008,55 @@ select {
   cursor: pointer;
 }
 
+/* Områdesväljare: Östergötland | Hela Sverige */
+.segmented {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.segmented__option {
+  position: relative;
+}
+.segmented__option input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.segmented__option span {
+  display: grid;
+  place-items: center;
+  height: 36px;
+  border-radius: 9px;
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+.segmented__option input:checked + span {
+  background: var(--navy-900);
+  box-shadow: var(--shadow-sm);
+  color: #fff;
+}
+:root[data-theme='dark'] .segmented__option input:checked + span {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.segmented__option input:focus-visible + span {
+  outline: 3px solid var(--focus);
+  outline-offset: 1px;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -1043,6 +1229,10 @@ select {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
 }
+.event.is-highlighted {
+  outline: 3px solid var(--signal);
+  outline-offset: 2px;
+}
 .event.is-new {
   border-color: color-mix(in srgb, var(--signal) 75%, var(--line));
   box-shadow: 0 0 0 3px rgb(214 239 10 / 0.35);
@@ -1145,6 +1335,15 @@ select {
 .event__link .icon {
   width: 15px;
   height: 15px;
+}
+
+@media (max-width: 419px) {
+  .brand {
+    font-size: 1.125rem;
+  }
+  .theme-button {
+    display: none;
+  }
 }
 
 @media (max-width: 559px) {
