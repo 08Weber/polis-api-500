@@ -1,0 +1,92 @@
+[
+  {
+    "id": 900010,
+    "datetime": "2026-10-11 2:13:45 +02:00",
+    "name": "11 oktober 02:13, Trafikolycka, Stockholm",
+    "summary": "Exempeldata för tester: två personbilar har kolliderat.",
+    "url": "/aktuellt/handelser/2026/oktober/11/11-oktober-02.13-trafikolycka-stockholm/",
+    "type": "Trafikolycka",
+    "location": { "name": "Stockholm", "gps": "59.329324,18.068581" }
+  },
+  {
+    "id": 900009,
+    "datetime": "2026-10-11 01:40:12 +02:00",
+    "name": "11 oktober 01:40, Misshandel, Göteborg",
+    "summary": "Exempeldata för tester: en man har blivit slagen utanför en restaurang.",
+    "url": "/aktuellt/handelser/2026/oktober/11/11-oktober-01.40-misshandel-goteborg/",
+    "type": "Misshandel",
+    "location": { "name": "Göteborg", "gps": "57.70887,11.97456" }
+  },
+  {
+    "id": 900008,
+    "datetime": "2026-10-11 00:05:00 +02:00",
+    "name": "11 oktober 00:05, Brand, Malmö",
+    "summary": "Exempeldata för tester: brand i en container.",
+    "url": "/aktuellt/handelser/2026/oktober/11/11-oktober-00.05-brand-malmo/",
+    "type": "Brand",
+    "location": { "name": "Malmö", "gps": "55.604981,13.003822" }
+  },
+  {
+    "id": 900007,
+    "datetime": "2026-10-10 23:58:30 +02:00",
+    "name": "10 oktober 23:58, Inbrott, Uppsala",
+    "summary": "Exempeldata för tester: inbrott i en villa.",
+    "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-23.58-inbrott-uppsala/",
+    "type": "Inbrott",
+    "location": { "name": "Uppsala", "gps": "59.858564,17.638927" }
+  },
+  {
+    "id": 900006,
+    "datetime": "2026-10-10 22:15:00 +02:00",
+    "name": "10 oktober 22:15, Sammanfattning kväll och natt, Västra Götalands län",
+    "summary": "Exempeldata för tester: sammanfattning av kvällen.",
+    "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-22.15-sammanfattning-kvall-och-natt-vastra-gotalands-lan/",
+    "type": "Sammanfattning kväll och natt",
+    "location": { "name": "Västra Götalands län", "gps": "58.252793,13.059643" }
+  },
+  {
+    "id": 900005,
+    "datetime": "2026-10-10 19:03:11 +02:00",
+    "name": "10 oktober 19:03, Rån, Stockholm",
+    "summary": "Exempeldata för tester: rån mot en butik.",
+    "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-19.03-ran-stockholm/",
+    "type": "Rån",
+    "location": { "name": "Stockholm", "gps": "59.329324,18.068581" }
+  },
+  {
+    "id": 900004,
+    "datetime": "2026-10-10 14:20:00 +02:00",
+    "name": "10 oktober 14:20, Trafikolycka, smitning från, Örebro",
+    "summary": "Exempeldata för tester: en bilist har kört från platsen.",
+    "url": "/aktuellt/handelser/2026/oktober/10/10-oktober-14.20-trafikolycka-smitning-fran-orebro/",
+    "type": "Trafikolycka, smitning från",
+    "location": { "name": "Örebro", "gps": "59.275263,15.213411" }
+  },
+  {
+    "id": 900003,
+    "datetime": "2026-10-09 09:12:00 +02:00",
+    "name": "09 oktober 09:12, Försvunnen person, Kiruna",
+    "summary": "Exempeldata för tester: en person har anmälts försvunnen.",
+    "url": "/aktuellt/handelser/2026/oktober/9/09-oktober-09.12-forsvunnen-person-kiruna/",
+    "type": "Försvunnen person",
+    "location": { "name": "Kiruna", "gps": "67.85572,20.225282" }
+  },
+  {
+    "id": 900002,
+    "datetime": "2026-10-09 08:00:00 +02:00",
+    "name": "09 oktober 08:00, Motorfordon, stöld, Lund",
+    "summary": "Exempeldata för tester: en bil har stulits.",
+    "url": "/aktuellt/handelser/2026/oktober/9/09-oktober-08.00-motorfordon-stold-lund/",
+    "type": "Motorfordon, stöld",
+    "location": { "name": "Lund", "gps": "55.70466,13.191007" }
+  },
+  {
+    "id": 900001,
+    "datetime": "2026-10-09 07:30:00 +02:00",
+    "name": "09 oktober 07:30, Skottlossning, misstänkt, Södertälje",
+    "summary": "Exempeldata för tester: misstänkta skott har hörts.",
+    "url": "/aktuellt/handelser/2026/oktober/9/09-oktober-07.30-skottlossning-misstankt-sodertalje/",
+    "type": "Skottlossning, misstänkt",
+    "location": { "name": "Södertälje", "gps": "59.19554,17.625168" }
+  }
+]
