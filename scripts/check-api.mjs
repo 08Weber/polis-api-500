@@ -6,10 +6,12 @@
  *   node scripts/check-api.mjs                     hämta live från polisen.se
  *   node scripts/check-api.mjs --file svar.json    kontrollera ett sparat svar
  *   node scripts/check-api.mjs --sample 5          skriv även ut 5 råa händelser
+ *   node scripts/check-api.mjs --url http://…      hämta från en annan adress (tester)
  *
  * Avslutas med kod 1 om något som sidan är beroende av inte stämmer.
  */
 import { readFile } from 'node:fs/promises';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { parseArgs } from 'node:util';
 import {
   API_URL,
@@ -31,6 +33,8 @@ const { values: args } = parseArgs({
     file: { type: 'string' },
     origin: { type: 'string', default: 'https://08weber.github.io' },
     sample: { type: 'string', default: '0' },
+    url: { type: 'string', default: API_URL },
+    'retry-delay': { type: 'string', default: '20' },
   },
 });
 
@@ -47,27 +51,59 @@ function finish() {
 
 /* ---- Hämta ---------------------------------------------------------- */
 
-let data;
-if (args.file) {
-  console.log(`Kontrollerar ${args.file}`);
-  data = JSON.parse(await readFile(args.file, 'utf8'));
-} else {
-  console.log(`Hämtar ${API_URL}  (Origin: ${args.origin})`);
+// API:et svarar ibland HTTP 200 med en tom lista en kort stund, så vi
+// försöker några gånger innan vi larmar.
+const ATTEMPTS = 4;
+const RETRY_DELAY_MS = Number(args['retry-delay']) * 1000;
+
+async function fetchEvents() {
   const started = performance.now();
-  let response;
   try {
-    response = await fetch(API_URL, {
+    const response = await fetch(args.url, {
       headers: {
         Accept: 'application/json',
         Origin: args.origin,
         'User-Agent': 'polis-api-500/api-check (+https://github.com/08Weber/polis-api-500)',
       },
     });
+    const body = await response.text();
+    return { response, body, ms: Math.round(performance.now() - started) };
   } catch (cause) {
-    errors.push(`Kunde inte nå API:et: ${cause.cause?.message ?? cause.message}`);
+    return { failure: cause.cause?.message ?? cause.message };
+  }
+}
+
+let data;
+if (args.file) {
+  console.log(`Kontrollerar ${args.file}`);
+  data = JSON.parse(await readFile(args.file, 'utf8'));
+} else {
+  console.log(`Hämtar ${args.url}  (Origin: ${args.origin})`);
+  let result;
+  let emptyAnswers = 0;
+  for (let attempt = 1; attempt <= ATTEMPTS; attempt += 1) {
+    result = await fetchEvents();
+    const empty = result.response?.ok && result.body.trim() === '[]';
+    if (result.response?.ok && !empty) break;
+
+    const reason = result.failure ?? (empty ? 'HTTP 200 men tom lista' : `HTTP ${result.response.status}`);
+    console.log(`Försök ${attempt} av ${ATTEMPTS}: ${reason}`);
+    if (empty) {
+      emptyAnswers += 1;
+      for (const [name, value] of result.response.headers) console.log(`  ${name}: ${value}`);
+    }
+    if (attempt < ATTEMPTS) await sleep(RETRY_DELAY_MS);
+  }
+  if (result.failure) {
+    errors.push(`Kunde inte nå API:et: ${result.failure}`);
     finish();
   }
-  console.log(`HTTP ${response.status} på ${Math.round(performance.now() - started)} ms`);
+  if (emptyAnswers && result.body.trim() !== '[]') {
+    warnings.push(`API:et svarade med en tom lista ${emptyAnswers} gång(er) innan det gav händelser.`);
+  }
+
+  const { response, body } = result;
+  console.log(`HTTP ${response.status} på ${result.ms} ms`);
   for (const header of [
     'content-type',
     'content-length',
@@ -94,7 +130,6 @@ if (args.file) {
     );
   }
 
-  const body = await response.text();
   if (!response.ok) {
     errors.push(`API:et svarade HTTP ${response.status}: ${body.slice(0, 200)}`);
     finish();

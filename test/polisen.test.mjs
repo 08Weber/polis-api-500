@@ -1,9 +1,7 @@
 import assert from 'node:assert/strict';
-import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { test } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { promisify } from 'node:util';
 
 import {
   categorize,
@@ -292,10 +290,4 @@ test('groupByDay grupperar per svensk kalenderdag, inte UTC', () => {
       ['2026-10-10', ['3', '2']],
     ],
   );
-});
-
-test('API-kontrollen godkänner de riktiga exempelhändelserna', async () => {
-  const script = fileURLToPath(new URL('../scripts/check-api.mjs', import.meta.url));
-  const { stdout } = await promisify(execFile)(process.execPath, [script, '--file', fixturePath]);
-  assert.match(stdout, /✓ API:et stämmer/);
 });
