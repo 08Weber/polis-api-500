@@ -141,12 +141,9 @@
 
     <header class="masthead">
       <div class="masthead__inner wrap">
-        <a class="brand" href="./">
-          <img class="brand__mark" src="favicon.svg" alt="" width="34" height="34" />
-          <span class="brand__name">Polishändelser</span>
-        </a>
+        <a class="brand" href="./"><span class="brand__polis">Polis</span><span class="brand__rest">händelser</span></a>
         <p class="live" id="live" role="status" data-state="loading">
-          <span class="live__dot" aria-hidden="true"></span>
+          <span class="live__lights" aria-hidden="true"><span></span><span></span></span>
           <span class="live__label" id="live-label">Hämtar händelser…</span>
         </p>
         <div class="masthead__actions">
@@ -162,10 +159,10 @@
 
         <div class="hero">
           <div class="hero__intro">
-            <p class="hero__eyebrow">Hela Sverige · direkt från Polisens öppna data</p>
-            <h1 class="hero__title">Senaste polishändelserna</h1>
+            <p class="hero__eyebrow">Inofficiell sida · Polisens öppna data · Hela Sverige</p>
+            <h1 class="hero__title">Lägesbild Sverige</h1>
             <p class="hero__lede">
-              Polisens 500 senaste händelsenotiser. Sök och filtrera på län och typ – sidan uppdateras automatiskt.
+              De 500 senaste händelsenotiserna från Polisen, live. Sök och filtrera på län, typ och kategori.
             </p>
             <p class="hero__sos">
               <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-phone" /></svg>
@@ -173,6 +170,93 @@
                 >Är det akut? Ring <a href="tel:112">112</a>. Övriga ärenden: <a href="tel:11414">114&nbsp;14</a>.</span
               >
             </p>
+          </div>
+
+          <div class="hero__car">
+            <svg
+              class="car"
+              viewBox="0 6 520 192"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <defs>
+                <clipPath id="car-kaross">
+                  <path
+                    d="M34 166 L30 122 Q30 108 40 104 L70 62 Q74 56 82 56 L296 52 Q304 52 310 58 L356 98 L462 110 Q488 114 492 132 L492 154 Q492 166 480 166 L433.5 166 A34 34 0 1 0 366.5 166 L163.5 166 A34 34 0 1 0 96.5 166 Z"
+                  />
+                </clipPath>
+                <pattern id="car-rutor" width="28" height="28" patternUnits="userSpaceOnUse" x="30" y="124">
+                  <rect width="28" height="28" fill="#1f4fd1" />
+                  <rect width="14" height="14" fill="#ffd60a" />
+                  <rect x="14" y="14" width="14" height="14" fill="#ffd60a" />
+                </pattern>
+                <filter id="car-sken" x="-60%" y="-200%" width="220%" height="500%">
+                  <feGaussianBlur stdDeviation="7" />
+                </filter>
+              </defs>
+
+              <ellipse cx="260" cy="189" rx="236" ry="6" fill="#000" opacity="0.35" />
+
+              <!-- Bilen ritas med fronten åt höger och speglas så att den kör in mot texten. -->
+              <g transform="translate(520 0) scale(-1 1)">
+                <path
+                  fill="#f3f6fb"
+                  d="M34 166 L30 122 Q30 108 40 104 L70 62 Q74 56 82 56 L296 52 Q304 52 310 58 L356 98 L462 110 Q488 114 492 132 L492 154 Q492 166 480 166 L433.5 166 A34 34 0 1 0 366.5 166 L163.5 166 A34 34 0 1 0 96.5 166 Z"
+                />
+                <g clip-path="url(#car-kaross)">
+                  <rect y="124" width="520" height="28" fill="url(#car-rutor)" />
+                  <rect y="156" width="520" height="12" fill="#cfd7e5" />
+                  <rect y="96" width="520" height="4" fill="#dfe5ef" />
+                </g>
+
+                <!-- Rutor och stolpar -->
+                <path fill="#0d1c3f" d="M50 99 L74 66 Q77 62 84 62 L292 58 Q299 58 303 62 L340 99 Z" />
+                <path fill="#fff" opacity="0.09" d="M150 99 L196 60 L232 59 L186 99 Z" />
+                <path fill="#fff" opacity="0.09" d="M262 99 L300 63 L318 79 L296 99 Z" />
+                <rect x="120" y="56" width="10" height="44" fill="#f3f6fb" />
+                <rect x="222" y="54" width="10" height="46" fill="#f3f6fb" />
+
+                <!-- Dörrskarvar, lampor, backspegel -->
+                <path d="M227 100 V166 M344 100 V166" stroke="#b9c3d6" stroke-width="1.5" fill="none" />
+                <path fill="#fff1b8" d="M466 114 Q482 115 489 122 L489 127 Q478 126 466 122 Z" />
+                <path
+                  fill="#e5484d"
+                  d="M31 126 L30.5 116 Q31 109 38 106 L55 82 L59 86 L44 108 Q40 112 40 118 L40 126 Z"
+                />
+                <path fill="#0d1c3f" d="M340 90 L354 88 L358 98 L342 99 Z" />
+                <rect x="478" y="140" width="14" height="8" rx="2" fill="#1a2546" />
+
+                <!-- Hjul -->
+                <g>
+                  <circle cx="130" cy="160" r="28" fill="#0b1226" />
+                  <circle cx="130" cy="160" r="15" fill="#cdd5e3" />
+                  <circle cx="130" cy="160" r="10" fill="#aab5c8" />
+                  <circle cx="130" cy="160" r="4" fill="#6b7790" />
+                  <circle cx="400" cy="160" r="28" fill="#0b1226" />
+                  <circle cx="400" cy="160" r="15" fill="#cdd5e3" />
+                  <circle cx="400" cy="160" r="10" fill="#aab5c8" />
+                  <circle cx="400" cy="160" r="4" fill="#6b7790" />
+                </g>
+
+                <!-- Blåljusramp -->
+                <rect x="150" y="45" width="96" height="9" rx="3" fill="#182446" />
+                <g class="car__flash car__flash--a">
+                  <ellipse cx="174" cy="44" rx="40" ry="14" fill="#5b95ff" filter="url(#car-sken)" />
+                  <rect x="152" y="40" width="44" height="9" rx="4" fill="#6ea2ff" />
+                </g>
+                <g class="car__flash car__flash--b">
+                  <ellipse cx="222" cy="44" rx="40" ry="14" fill="#5b95ff" filter="url(#car-sken)" />
+                  <rect x="200" y="40" width="44" height="9" rx="4" fill="#6ea2ff" />
+                </g>
+              </g>
+
+              <!-- Text utanför speglingen (x = 520 - x i den speglade bilen) -->
+              <g fill="#1f4fd1" font-family="'Barlow Condensed', sans-serif" font-weight="700" text-anchor="middle">
+                <text x="234" y="120" font-size="22" letter-spacing="3">POLIS</text>
+                <text x="344" y="119" font-size="15" letter-spacing="1">112</text>
+              </g>
+            </svg>
           </div>
 
           <dl class="stats" id="stats">
@@ -252,7 +336,7 @@
 
       <section class="feed" aria-labelledby="feed-title">
         <div class="feed__head">
-          <h2 class="feed__title" id="feed-title">Händelser</h2>
+          <h2 class="feed__title" id="feed-title">Händelselogg</h2>
           <p class="feed__count" id="count" aria-live="polite"></p>
         </div>
 
@@ -277,12 +361,32 @@
     </main>
 
     <footer class="site-footer">
-      <div class="battenburg battenburg--small" aria-hidden="true"></div>
+      <div class="tape" aria-hidden="true">
+        <div class="tape__band">
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+          <span>Polis</span>
+        </div>
+      </div>
       <div class="site-footer__grid wrap">
         <div>
           <p class="site-footer__brand">
-            <img src="favicon.svg" alt="" width="22" height="22" />
-            Polishändelser
+            <span class="brand brand--small"
+              ><span class="brand__polis">Polis</span><span class="brand__rest">händelser</span></span
+            >
           </p>
           <p>En inofficiell hobbysida som visar Polisens öppna data. Sidan har ingen koppling till Polisen.</p>
         </div>
@@ -308,9 +412,11 @@
           </ul>
         </div>
       </div>
-      <p class="site-footer__credit wrap">
-        Gjord av @millew08 · <a href="https://github.com/08Weber/polis-api-500">Källkod på GitHub</a>
-      </p>
+      <div class="wrap">
+        <p class="site-footer__credit">
+          Gjord av @millew08 · <a href="https://github.com/08Weber/polis-api-500">Källkod på GitHub</a>
+        </p>
+      </div>
     </footer>
   </body>
 </html>
