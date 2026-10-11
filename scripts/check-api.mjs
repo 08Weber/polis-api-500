@@ -45,7 +45,11 @@ function finish() {
   console.log('');
   for (const message of warnings) console.log(`VARNING: ${message}`);
   for (const message of errors) console.log(`FEL: ${message}`);
-  console.log(errors.length ? '\n✗ API:et stämmer inte med vad sidan förväntar sig.' : '\n✓ API:et stämmer med vad sidan förväntar sig.');
+  console.log(
+    errors.length
+      ? '\n✗ API:et stämmer inte med vad sidan förväntar sig.'
+      : '\n✓ API:et stämmer med vad sidan förväntar sig.',
+  );
   process.exit(errors.length ? 1 : 0);
 }
 
@@ -175,7 +179,9 @@ console.log('\nFält som sidan använder:');
 for (const [field, check, critical] of checks) {
   const failing = data.filter((event) => !event || typeof event !== 'object' || !check(event));
   const share = data.length ? failing.length / data.length : 0;
-  console.log(`  ${failing.length ? '✗' : '✓'} ${field}${failing.length ? `: ${failing.length} st saknas/felaktiga` : ''}`);
+  console.log(
+    `  ${failing.length ? '✗' : '✓'} ${field}${failing.length ? `: ${failing.length} st saknas/felaktiga` : ''}`,
+  );
   if (failing.length) {
     console.log(`      t.ex. ${JSON.stringify(failing[0]).slice(0, 300)}`);
     const message = `${failing.length} av ${data.length} händelser har problem med "${field}".`;

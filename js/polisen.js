@@ -274,7 +274,9 @@ export function normalizeEvent(raw) {
 
 function byNewest(a, b) {
   const time = (event) => (Number.isFinite(event.time) ? event.time : -Infinity);
-  return time(b) - time(a) || (b.published?.getTime() ?? 0) - (a.published?.getTime() ?? 0) || collator.compare(b.id, a.id);
+  return (
+    time(b) - time(a) || (b.published?.getTime() ?? 0) - (a.published?.getTime() ?? 0) || collator.compare(b.id, a.id)
+  );
 }
 
 /** Hela API-svaret → normaliserade händelser, nyast först. */
@@ -310,9 +312,7 @@ export function filterEvents(events, { q = '', county = '', type = '', category 
 export function countValues(events, key) {
   const counts = new Map();
   for (const event of events) counts.set(event[key], (counts.get(event[key]) ?? 0) + 1);
-  return [...counts]
-    .map(([value, count]) => ({ value, count }))
-    .sort((a, b) => collator.compare(a.value, b.value));
+  return [...counts].map(([value, count]) => ({ value, count })).sort((a, b) => collator.compare(a.value, b.value));
 }
 
 function mostCommon(counts) {
@@ -330,9 +330,12 @@ export function computeStats(events, now = Date.now()) {
   let oldest = null;
   const types = new Map();
   const counties = new Map();
+  const places = new Map();
 
   for (const event of events) {
     counties.set(event.county, (counties.get(event.county) ?? 0) + 1);
+    // Notiser som gäller hela länet räknas inte som en ort.
+    if (event.place !== event.county) places.set(event.place, (places.get(event.place) ?? 0) + 1);
     // Sammanfattningar är inte händelser i sig.
     if (event.category !== 'sammanfattning') types.set(event.type, (types.get(event.type) ?? 0) + 1);
     if (!event.date) continue;
@@ -351,6 +354,7 @@ export function computeStats(events, now = Date.now()) {
     oldest,
     topType: mostCommon(types),
     topCounty: mostCommon(counties),
+    topPlace: mostCommon(places),
   };
 }
 

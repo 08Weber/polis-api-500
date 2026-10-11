@@ -67,7 +67,10 @@ test('parseEventName plockar ut händelsetid och ort ur rubriken', () => {
   assert.equal(brand.place, 'Huddinge');
 
   // Typen kan innehålla kommatecken.
-  assert.equal(parseEventName('10 oktober 20.06, Trafikolycka, singel, Perstorp', 'Trafikolycka, singel', published).place, 'Perstorp');
+  assert.equal(
+    parseEventName('10 oktober 20.06, Trafikolycka, singel, Perstorp', 'Trafikolycka, singel', published).place,
+    'Perstorp',
+  );
   // Ibland är "orten" länet.
   assert.equal(parseEventName('10 oktober 21.45, Övrigt, Hallands län', 'Övrigt', published).place, 'Hallands län');
   // Utan ort.
@@ -80,7 +83,10 @@ test('parseEventName plockar ut händelsetid och ort ur rubriken', () => {
 
 test('parseEventName räknar ut rätt år kring årsskiftet', () => {
   const newYear = parseDateTime('2027-01-01 0:20:00 +01:00');
-  assert.equal(iso(parseEventName('31 december 23.50, Brand, Kiruna', 'Brand', newYear).date), '2026-12-31T22:50:00.000Z');
+  assert.equal(
+    iso(parseEventName('31 december 23.50, Brand, Kiruna', 'Brand', newYear).date),
+    '2026-12-31T22:50:00.000Z',
+  );
   const winter = parseDateTime('2027-01-05 9:00:00 +01:00');
   assert.equal(iso(parseEventName('5 januari 08.00, Brand, Kiruna', 'Brand', winter).date), '2027-01-05T07:00:00.000Z');
 });
@@ -106,7 +112,14 @@ test('toPolisenUrl gör relativa länkar absoluta och släpper bara igenom polis
   );
   assert.equal(toPolisenUrl('http://polisen.se/a/'), 'https://polisen.se/a/');
   assert.equal(toPolisenUrl('https://www.polisen.se/a/'), 'https://www.polisen.se/a/');
-  for (const value of ['https://example.com/a', 'javascript:alert(1)', '//evil.example/a', 'https://polisen.se.evil.example/', '', null]) {
+  for (const value of [
+    'https://example.com/a',
+    'javascript:alert(1)',
+    '//evil.example/a',
+    'https://polisen.se.evil.example/',
+    '',
+    null,
+  ]) {
     assert.equal(toPolisenUrl(value), null, String(value));
   }
 });
@@ -206,7 +219,12 @@ test('normalizeEvent tål saknade fält', () => {
   assert.equal(normalizeEvent(null), null);
 
   // Rubrik som inte går att tolka: använd publiceringstid och län.
-  const fallback = normalizeEvent({ id: 2, datetime: '2026-10-10 8:29:23 +02:00', name: 'Rubrik', location: { name: 'Uppsala län' } });
+  const fallback = normalizeEvent({
+    id: 2,
+    datetime: '2026-10-10 8:29:23 +02:00',
+    name: 'Rubrik',
+    location: { name: 'Uppsala län' },
+  });
   assert.equal(iso(fallback.date), '2026-10-10T06:29:23.000Z');
   assert.equal(fallback.place, 'Uppsala län');
 });
@@ -234,7 +252,14 @@ test('normalizeEvents sorterar på händelsetid, nyast först', () => {
 test('filterEvents', () => {
   assert.equal(filterEvents(events).length, 12);
   assert.deepEqual(ids(filterEvents(events, { county: 'Skåne län' })), ['655834', '655832']);
-  assert.deepEqual(ids(filterEvents(events, { category: 'trafik' })), ['655834', '655832', '655833', '655827', '655805', '655802']);
+  assert.deepEqual(ids(filterEvents(events, { category: 'trafik' })), [
+    '655834',
+    '655832',
+    '655833',
+    '655827',
+    '655805',
+    '655802',
+  ]);
   assert.deepEqual(ids(filterEvents(events, { type: 'Rattfylleri' })), ['655833', '655805']);
   // Fritext: alla ord måste finnas, skiftlägesokänsligt, även åäö, och orten går att söka på.
   assert.deepEqual(ids(filterEvents(events, { q: 'STOCKHOLM' })), ['655837', '655827']);
@@ -244,7 +269,12 @@ test('filterEvents', () => {
 });
 
 test('countValues sorterar i svensk bokstavsordning (å, ä, ö sist)', () => {
-  assert.deepEqual(countValues(events, 'place').map((entry) => entry.value).slice(-2), ['Ängelholm', 'Östersund']);
+  assert.deepEqual(
+    countValues(events, 'place')
+      .map((entry) => entry.value)
+      .slice(-2),
+    ['Ängelholm', 'Östersund'],
+  );
   assert.equal(countValues(events, 'county').find((entry) => entry.value === 'Skåne län').count, 2);
 });
 
@@ -258,6 +288,8 @@ test('computeStats', () => {
   assert.equal(iso(stats.oldest), '2026-10-10T05:44:00.000Z');
   assert.deepEqual(stats.topType, { value: 'Rattfylleri', count: 2 });
   assert.equal(stats.topCounty.count, 2);
+  assert.equal(stats.topPlace.count, 1); // "Hallands län" och "Jönköpings län" räknas inte som orter
+  assert.ok(!stats.topPlace.value.endsWith(' län'));
 });
 
 test('svenska tidsformat i svensk tid', () => {
