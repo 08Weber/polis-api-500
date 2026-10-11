@@ -1,5 +1,5 @@
-/* Polishändelser – inspirerad av svenska polisens marinblå och battenburgmönstret
-   (blått och signalgult) på polisbilarna. Typsnitt: Barlow, SIL Open Font License. */
+/* Polishändelser – i svensk polisstil: marinblått, polisblått och fluorescerande gulgrönt,
+   med blockmönstret från svenska polisbilar. Typsnitt: Barlow, SIL Open Font License. */
 
 @font-face {
   font-family: 'Barlow';
@@ -47,13 +47,14 @@
   --font-body: 'Barlow', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-display: 'Barlow Condensed', 'Barlow', ui-sans-serif, system-ui, sans-serif;
 
-  /* Polisblått och signalgult – samma i båda teman */
+  /* Polisblått och fluorescerande gulgrönt som på svenska polisbilar – samma i båda teman */
   --navy-950: #050e26;
   --navy-900: #0a1b44;
   --navy-800: #11285e;
-  --police-blue: #1f4fd1;
-  --signal: #ffd60a;
-  --signal-hover: #ffe14d;
+  --police-blue: #0a3ca8;
+  --signal: #d6ef0a;
+  --signal-hover: #e3f75c;
+  --warn: #f5b700;
 
   --bg: #eef2f8;
   --surface: #ffffff;
@@ -96,7 +97,7 @@
   --accent: #93b3ff;
   --accent-hover: #bccfff;
   --accent-ink: #061232;
-  --focus: #ffd60a;
+  --focus: #d6ef0a;
   --shadow-sm: none;
   --shadow: 0 12px 32px -16px rgb(0 0 0 / 0.7);
 
@@ -465,7 +466,7 @@ select {
   animation-name: blink-b;
 }
 .live[data-state='stale'] .live__lights span {
-  background: var(--signal);
+  background: var(--warn);
 }
 .live[data-state='error'] .live__lights span {
   background: #ff5f6f;
@@ -556,9 +557,9 @@ select {
   gap: 9px;
   margin: 18px 0 0;
   padding: 9px 13px;
-  border: 1px solid rgb(255 214 10 / 0.38);
+  border: 1px solid rgb(214 239 10 / 0.4);
   border-radius: 12px;
-  background: rgb(255 214 10 / 0.08);
+  background: rgb(214 239 10 / 0.08);
   font-size: 0.9375rem;
   line-height: 1.35;
 }
@@ -593,6 +594,12 @@ select {
   width: 100%;
   height: auto;
   overflow: visible;
+}
+.car__text {
+  fill: var(--police-blue);
+  font: 600 25px var(--font-body);
+  letter-spacing: 1px;
+  text-anchor: middle;
 }
 .car__flash {
   animation: blink-a 0.9s steps(1, end) infinite;
@@ -683,15 +690,18 @@ select {
   }
 }
 
-/* Battenburgmönster i polisbilsstorlek: två rader rutor i blått och signalgult,
-   med en vit list ovanför som karossen på bilen. */
-.battenburg {
-  --ruta: clamp(14px, 2vw, 26px);
+/* Blockmönstret från svenska polisbilar: stora block i blått och gulgrönt i en rad,
+   med vita lister ovanför och under som karossen. */
+.livery {
+  --hojd: clamp(18px, 2.4vw, 30px);
   box-sizing: content-box;
-  height: calc(var(--ruta) * 2);
-  border-top: 3px solid #f3f6fb;
-  background: conic-gradient(var(--signal) 0 25%, var(--police-blue) 0 50%, var(--signal) 0 75%, var(--police-blue) 0) 0
-    0 / calc(var(--ruta) * 2) calc(var(--ruta) * 2);
+  height: var(--hojd);
+  border-block: 4px solid #f3f6fb;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--police-blue) 0 calc(var(--hojd) * 4.4),
+    var(--signal) 0 calc(var(--hojd) * 7.2)
+  );
 }
 
 /* Polisens blåvita avspärrningsband */
@@ -955,11 +965,10 @@ select {
 .feed__title::after {
   content: '';
   display: block;
-  width: 96px;
-  height: 12px;
+  width: 112px;
+  height: 9px;
   margin-top: 9px;
-  background: conic-gradient(var(--signal) 0 25%, var(--police-blue) 0 50%, var(--signal) 0 75%, var(--police-blue) 0) 0
-    0 / 12px 12px;
+  background: repeating-linear-gradient(90deg, var(--police-blue) 0 44px, var(--signal) 0 68px);
 }
 .feed__count {
   margin: 0;
@@ -1036,7 +1045,7 @@ select {
 }
 .event.is-new {
   border-color: color-mix(in srgb, var(--signal) 75%, var(--line));
-  box-shadow: 0 0 0 3px rgb(255 214 10 / 0.28);
+  box-shadow: 0 0 0 3px rgb(214 239 10 / 0.35);
 }
 
 .event__icon {
@@ -1211,8 +1220,8 @@ select {
   margin-top: 1px;
 }
 .notice--warn {
-  border-color: color-mix(in srgb, var(--signal) 70%, var(--line));
-  background: color-mix(in srgb, var(--signal) 14%, var(--surface));
+  border-color: color-mix(in srgb, var(--warn) 70%, var(--line));
+  background: color-mix(in srgb, var(--warn) 12%, var(--surface));
 }
 .notice--warn > .icon {
   color: var(--cat-trafik);

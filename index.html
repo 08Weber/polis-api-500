@@ -186,11 +186,6 @@
                     d="M34 166 L30 122 Q30 108 40 104 L70 62 Q74 56 82 56 L296 52 Q304 52 310 58 L356 98 L462 110 Q488 114 492 132 L492 154 Q492 166 480 166 L433.5 166 A34 34 0 1 0 366.5 166 L163.5 166 A34 34 0 1 0 96.5 166 Z"
                   />
                 </clipPath>
-                <pattern id="car-rutor" width="28" height="28" patternUnits="userSpaceOnUse" x="30" y="124">
-                  <rect width="28" height="28" fill="#1f4fd1" />
-                  <rect width="14" height="14" fill="#ffd60a" />
-                  <rect x="14" y="14" width="14" height="14" fill="#ffd60a" />
-                </pattern>
                 <filter id="car-sken" x="-60%" y="-200%" width="220%" height="500%">
                   <feGaussianBlur stdDeviation="7" />
                 </filter>
@@ -204,21 +199,41 @@
                   fill="#f3f6fb"
                   d="M34 166 L30 122 Q30 108 40 104 L70 62 Q74 56 82 56 L296 52 Q304 52 310 58 L356 98 L462 110 Q488 114 492 132 L492 154 Q492 166 480 166 L433.5 166 A34 34 0 1 0 366.5 166 L163.5 166 A34 34 0 1 0 96.5 166 Z"
                 />
+
+                <!-- Svensk polisdekor: stora block i blått och gulgrönt -->
                 <g clip-path="url(#car-kaross)">
-                  <rect y="124" width="520" height="28" fill="url(#car-rutor)" />
-                  <rect y="156" width="520" height="12" fill="#cfd7e5" />
-                  <rect y="96" width="520" height="4" fill="#dfe5ef" />
+                  <!-- Övre rad bak och fram -->
+                  <rect x="30" y="105" width="58" height="23" fill="#0a3ca8" />
+                  <rect x="50" y="109" width="22" height="15" rx="4" fill="#2457c2" />
+                  <rect x="88" y="105" width="40" height="23" fill="#d6ef0a" />
+                  <rect x="344" y="104" width="50" height="24" fill="#d6ef0a" />
+                  <path d="M394 104 L472 112 L472 120 L394 128 Z" fill="#0a3ca8" />
+                  <!-- Nedre rad längs dörrarna -->
+                  <rect x="30" y="128" width="70" height="24" fill="#d6ef0a" />
+                  <rect x="128" y="128" width="68" height="24" fill="#0a3ca8" />
+                  <rect x="196" y="128" width="66" height="24" fill="#d6ef0a" />
+                  <rect x="262" y="128" width="82" height="24" fill="#0a3ca8" />
+                  <path d="M474 134 L492 134 L492 152 L478 152 Z" fill="#d6ef0a" />
+                  <!-- Tröskel -->
+                  <rect x="0" y="154" width="520" height="14" fill="#3b465e" />
                 </g>
 
-                <!-- Rutor och stolpar -->
-                <path fill="#0d1c3f" d="M50 99 L74 66 Q77 62 84 62 L292 58 Q299 58 303 62 L340 99 Z" />
-                <path fill="#fff" opacity="0.09" d="M150 99 L196 60 L232 59 L186 99 Z" />
-                <path fill="#fff" opacity="0.09" d="M262 99 L300 63 L318 79 L296 99 Z" />
-                <rect x="120" y="56" width="10" height="44" fill="#f3f6fb" />
-                <rect x="222" y="54" width="10" height="46" fill="#f3f6fb" />
+                <!-- Gulgröna fönsterramar och stolpar -->
+                <path fill="#d6ef0a" d="M44 99 L70 64 Q74 59 82 59 L294 55 Q302 55 307 60 L346 99 Z" />
+                <path fill="#0d1c3f" d="M51 99 L74 68 Q77 64 84 64 L292 60 Q299 60 303 64 L339 99 Z" />
+                <path fill="#fff" opacity="0.09" d="M150 99 L196 61 L232 60 L186 99 Z" />
+                <path fill="#fff" opacity="0.09" d="M262 99 L300 64 L318 80 L296 99 Z" />
+                <rect x="119" y="60" width="11" height="40" fill="#d6ef0a" />
+                <rect x="221" y="58" width="12" height="42" fill="#d6ef0a" />
 
                 <!-- Dörrskarvar, lampor, backspegel -->
-                <path d="M227 100 V166 M344 100 V166" stroke="#b9c3d6" stroke-width="1.5" fill="none" />
+                <path
+                  d="M128 100 V152 M227 100 V166 M344 100 V166"
+                  stroke="#0a1b44"
+                  stroke-opacity="0.22"
+                  stroke-width="1.5"
+                  fill="none"
+                />
                 <path fill="#fff1b8" d="M466 114 Q482 115 489 122 L489 127 Q478 126 466 122 Z" />
                 <path
                   fill="#e5484d"
@@ -239,23 +254,22 @@
                   <circle cx="400" cy="160" r="4" fill="#6b7790" />
                 </g>
 
+                <!-- Takräcken -->
+                <path d="M96 53.5 L284 50" stroke="#1a2546" stroke-width="3" stroke-linecap="round" fill="none" />
                 <!-- Blåljusramp -->
-                <rect x="150" y="45" width="96" height="9" rx="3" fill="#182446" />
+                <rect x="150" y="44" width="96" height="10" rx="3" fill="#182446" />
                 <g class="car__flash car__flash--a">
-                  <ellipse cx="174" cy="44" rx="40" ry="14" fill="#5b95ff" filter="url(#car-sken)" />
-                  <rect x="152" y="40" width="44" height="9" rx="4" fill="#6ea2ff" />
+                  <ellipse cx="174" cy="43" rx="40" ry="14" fill="#4d8dff" filter="url(#car-sken)" />
+                  <rect x="152" y="39" width="44" height="10" rx="4" fill="#5d97ff" />
                 </g>
                 <g class="car__flash car__flash--b">
-                  <ellipse cx="222" cy="44" rx="40" ry="14" fill="#5b95ff" filter="url(#car-sken)" />
-                  <rect x="200" y="40" width="44" height="9" rx="4" fill="#6ea2ff" />
+                  <ellipse cx="222" cy="43" rx="40" ry="14" fill="#4d8dff" filter="url(#car-sken)" />
+                  <rect x="200" y="39" width="44" height="10" rx="4" fill="#5d97ff" />
                 </g>
               </g>
 
-              <!-- Text utanför speglingen (x = 520 - x i den speglade bilen) -->
-              <g fill="#1f4fd1" font-family="'Barlow Condensed', sans-serif" font-weight="700" text-anchor="middle">
-                <text x="234" y="120" font-size="22" letter-spacing="3">POLIS</text>
-                <text x="344" y="119" font-size="15" letter-spacing="1">112</text>
-              </g>
+              <!-- POLIS på framdörren, utanför speglingen så att texten inte blir spegelvänd -->
+              <text class="car__text" x="230" y="123">POLIS</text>
             </svg>
           </div>
 
@@ -284,7 +298,7 @@
         </div>
       </div>
 
-      <div class="battenburg" aria-hidden="true"></div>
+      <div class="livery" aria-hidden="true"></div>
     </header>
 
     <main class="layout wrap" id="handelser">

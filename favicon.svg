@@ -1,8 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <clipPath id="ruta"><rect width="32" height="32" rx="7"/></clipPath>
   <g clip-path="url(#ruta)">
-    <rect width="32" height="32" fill="#1f4fd1"/>
-    <rect width="16" height="16" fill="#ffd60a"/>
-    <rect x="16" y="16" width="16" height="16" fill="#ffd60a"/>
+    <rect width="32" height="32" fill="#f3f6fb"/>
+    <rect y="17" width="19" height="15" fill="#0a3ca8"/>
+    <rect x="19" y="17" width="13" height="15" fill="#d6ef0a"/>
+    <rect x="8" y="5" width="16" height="6" rx="2" fill="#2f6bff"/>
   </g>
 </svg>

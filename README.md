@@ -16,10 +16,11 @@ En inofficiell hobbysida utan koppling till Polisen.
 - Sparar senaste svaret i webbläsaren, så att sidan visas direkt och klarar tillfälliga avbrott
 - Ljust och mörkt tema, fungerar på mobil, tangentbord (`/` hoppar till sök) och skärmläsare
 
-Designen bygger på svensk polisstil: marinblått och signalgult, battenburgmönstret från polisbilarna,
-en egenritad polisbil med blåljus som blinkar, ett reflexmärke som logga och Polisens blåvita
-avspärrningsband i sidfoten. Blåljusen blinkar lugnt (högst ungefär en gång per sekund) och står stilla
-för den som valt reducerad rörelse. Polisens logotyp och vapen används inte.
+Designen bygger på svenska polisbilar: marinblått, polisblått och fluorescerande gulgrönt, stora block
+i en rad längs sidan (inte brittiska rutor), en egenritad polisbil med blåljus som blinkar, ett
+reflexmärke som logga och Polisens blåvita avspärrningsband i sidfoten. Blåljusen blinkar lugnt (högst
+ungefär en gång per sekund) och står stilla för den som valt reducerad rörelse. Polisens logotyp och
+vapen används inte.
 
 ## Så fungerar det
 
