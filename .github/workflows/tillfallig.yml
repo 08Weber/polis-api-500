@@ -1,0 +1,22 @@
+name: Tillfällig headerkontroll
+on: push
+permissions: {}
+jobs:
+  headers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Live-sidan
+        run: |
+          echo "== https sidan"; curl -sSI https://08weber.github.io/polis-api-500/
+          echo "== https sw.js"; curl -sSI https://08weber.github.io/polis-api-500/sw.js
+          echo "== http -> https?"; curl -sSI http://08weber.github.io/polis-api-500/ | head -6
+          echo "== .git exponerad?"; curl -s -o /dev/null -w '%{http_code}\n' https://08weber.github.io/polis-api-500/.git/config
+          echo "== meta-CSP i live-HTML (gammal version just nu)"; curl -sS https://08weber.github.io/polis-api-500/ | grep -c 'Content-Security-Policy' || true
+      - name: Gamla domänen webertool.ml
+        run: |
+          for name in webertool.ml www.webertool.ml; do
+            echo "== $name"; dig +short "$name" A; dig +short "$name" CNAME; dig +short "$name" NS
+          done
+          curl -sSI -m 10 http://webertool.ml/ 2>&1 | head -8 || true
+          curl -sSI -m 10 http://www.webertool.ml/ 2>&1 | head -8 || true
