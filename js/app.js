@@ -3,6 +3,8 @@ import {
   CATEGORIES,
   HOME_COUNTY,
   HOME_MUNICIPALITIES,
+  MAX_REQUESTS_PER_HOUR,
+  MIN_REQUEST_GAP,
   TIME_ZONE,
   collator,
   computeStats,
@@ -17,21 +19,28 @@ import {
   groupByDay,
   mapUrl,
   normalizeEvents,
+  recentRequests,
   relativeTime,
+  requestDelay,
 } from './polisen.js';
 
 const REFRESH_INTERVAL = 5 * 60_000;
 const RETRY_DELAYS = [15_000, 30_000, 60_000, 2 * 60_000, 5 * 60_000];
+// När Polisens API svarar 429 (för många anrop).
+const RATE_LIMITED_DELAY = 15 * 60_000;
 const REQUEST_TIMEOUT = 20_000;
 const PAGE_SIZE = 50;
 // Markera nya händelser bara om förra hämtningen är någorlunda färsk.
 const MARK_NEW_WITHIN = 12 * 60 * 60_000;
 // Notiser bara för händelser som publicerats nyligen, aldrig för gamla.
 const NOTIFY_MAX_AGE = 2 * 60 * 60_000;
+// Filter i adressfältet kommer från länkar och ska inte kunna bli hur långa som helst.
+const MAX_FILTER_LENGTH = 100;
 const STORAGE = {
   theme: 'polis-api-500:tema',
   notify: 'polis-api-500:notiser',
   seen: 'polis-api-500:sedda',
+  requests: 'polis-api-500:anrop',
   cache: (scope) => `polis-api-500:handelser:${scope}`,
 };
 
@@ -181,7 +190,12 @@ function eventDomId(id) {
 /* Hämtning                                                            */
 /* ------------------------------------------------------------------ */
 
-class ApiError extends Error {}
+class ApiError extends Error {
+  constructor(message, retryAfter = 0) {
+    super(message);
+    this.retryAfter = retryAfter; // ms att vänta innan nästa försök, 0 = som vanligt
+  }
+}
 
 async function fetchEvents(url) {
   const controller = new AbortController();
@@ -192,6 +206,9 @@ async function fetchEvents(url) {
       cache: 'no-store',
       signal: controller.signal,
     });
+    if (response.status === 429) {
+      throw new ApiError('Polisens API tar inte emot fler anrop just nu.', RATE_LIMITED_DELAY);
+    }
     if (!response.ok) throw new ApiError(`Polisens API svarade med felkod ${response.status}.`);
     const data = await response.json();
     if (!Array.isArray(data)) throw new ApiError('Polisens API skickade ett oväntat svar.');
@@ -206,6 +223,42 @@ async function fetchEvents(url) {
   } finally {
     clearTimeout(timer);
   }
+}
+
+// Anropen loggas i localStorage så att alla öppna flikar delar på Polisens anropsgräns.
+let requestLog = [];
+
+function readRequestLog(now) {
+  let saved = null;
+  try {
+    saved = JSON.parse(storageGet(STORAGE.requests));
+  } catch {
+    // Trasig logg: använd den i minnet.
+  }
+  return recentRequests([...new Set([...(Array.isArray(saved) ? saved : []), ...requestLog])], now);
+}
+
+/** Tar en plats i anropskvoten. Ger 0 om vi får anropa nu, annars hur många ms vi ska vänta. */
+async function reserveRequest() {
+  const reserve = () => {
+    const now = Date.now();
+    const times = readRequestLog(now);
+    const wait = requestDelay(times, now);
+    if (!wait) {
+      requestLog = [...times, now].slice(-MAX_REQUESTS_PER_HOUR);
+      storageSet(STORAGE.requests, JSON.stringify(requestLog));
+    }
+    return wait;
+  };
+  // Låset hindrar två flikar från att ta samma plats samtidigt.
+  if (navigator.locks) {
+    try {
+      return await navigator.locks.request(STORAGE.requests, reserve);
+    } catch {
+      // Utan lås fungerar det nästan lika bra.
+    }
+  }
+  return reserve();
 }
 
 /** Länsfiltret i API:et ska bara ge länets händelser, men vi litar inte blint på det. */
@@ -251,6 +304,17 @@ async function refresh(scope = state.scope) {
   if (scope === state.scope) renderLive();
 
   try {
+    const wait = await reserveRequest();
+    if (wait) {
+      // Polisens regler: vänta tills nästa anrop är tillåtet.
+      if (wait > MIN_REQUEST_GAP) {
+        source.error = new ApiError(
+          `Sidan har nått gränsen för hur ofta Polisens API får anropas och hämtar igen om ${Math.ceil(wait / 60_000)} min.`,
+        );
+      }
+      schedule(scope, wait);
+      return;
+    }
     const result = await fetchEvents(SCOPES[scope].url);
     const events = eventsForScope(scope, result.events);
     const known = new Set(source.events.map((event) => event.id));
@@ -265,7 +329,7 @@ async function refresh(scope = state.scope) {
   } catch (error) {
     source.error = error;
     source.failures += 1;
-    schedule(scope, RETRY_DELAYS[Math.min(source.failures, RETRY_DELAYS.length) - 1]);
+    schedule(scope, error.retryAfter || RETRY_DELAYS[Math.min(source.failures, RETRY_DELAYS.length) - 1]);
   } finally {
     source.loading = false;
     if (scope === state.scope) render();
@@ -280,7 +344,9 @@ function readStateFromUrl() {
   const params = new URLSearchParams(location.search);
   const scope = params.get('omrade') === 'sverige' ? 'sverige' : HOME;
   const filters = {};
-  for (const [key, name] of Object.entries(URL_PARAMS)) filters[key] = params.get(name)?.trim() ?? '';
+  for (const [key, name] of Object.entries(URL_PARAMS)) {
+    filters[key] = params.get(name)?.trim().slice(0, MAX_FILTER_LENGTH) ?? '';
+  }
   // Ort hör till Östergötland och län till hela Sverige.
   if (scope === HOME) filters.county = '';
   else filters.place = '';
@@ -704,11 +770,19 @@ function markSeen(events) {
   writeSeen(seen);
 }
 
+// Sidans CSP kräver Trusted Types: den enda skript-URL som får laddas är sw.js.
+const scriptUrls = window.trustedTypes?.createPolicy('utryckning', {
+  createScriptURL(url) {
+    if (url !== 'sw.js') throw new TypeError(`Otillåten skript-URL: ${url}`);
+    return url;
+  },
+});
+
 /** Service worker behövs för notiser på Android och för att kunna klicka på dem. */
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) return Promise.resolve(null);
   notify.registration ??= navigator.serviceWorker
-    .register('sw.js')
+    .register(scriptUrls ? scriptUrls.createScriptURL('sw.js') : 'sw.js')
     .then(() => navigator.serviceWorker.ready)
     .catch(() => null);
   return notify.registration;
@@ -943,7 +1017,7 @@ function init() {
     if (!shown) ui.notifyStatus.textContent = 'Testnotisen kunde inte visas i den här webbläsaren.';
   });
   navigator.serviceWorker?.addEventListener('message', (event) => {
-    if (event.data?.type === 'visa-handelse') showEvent(event.data.id);
+    if (event.data?.type === 'visa-handelse' && typeof event.data.id === 'string') showEvent(event.data.id);
   });
 
   ui.theme.addEventListener('click', () => {

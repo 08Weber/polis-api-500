@@ -51,6 +51,31 @@ const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
 /* ------------------------------------------------------------------ */
+/* Anropsgräns                                                         */
+/* ------------------------------------------------------------------ */
+
+// Polisens regler för öppna data: minst 10 sekunder mellan anropen och högst 60 i timmen.
+// https://polisen.se/om-polisen/om-webbplatsen/oppna-data/regler-for-oppna-data/
+export const MIN_REQUEST_GAP = 10_000;
+export const MAX_REQUESTS_PER_HOUR = 50; // med marginal till Polisens gräns
+
+/** Anropen (ms sedan 1970) under den senaste timmen, äldst först. Trasiga värden och framtida tider tas bort. */
+export function recentRequests(times, now = Date.now()) {
+  if (!Array.isArray(times)) return [];
+  return times.filter((time) => Number.isFinite(time) && time <= now && now - time < HOUR).sort((a, b) => a - b);
+}
+
+/** Hur många ms man måste vänta innan nästa anrop får göras, 0 om det går nu. */
+export function requestDelay(times, now = Date.now()) {
+  const recent = recentRequests(times, now);
+  let wait = recent.length ? recent.at(-1) + MIN_REQUEST_GAP - now : 0;
+  if (recent.length >= MAX_REQUESTS_PER_HOUR) {
+    wait = Math.max(wait, recent[recent.length - MAX_REQUESTS_PER_HOUR] + HOUR - now);
+  }
+  return Math.max(0, wait);
+}
+
+/* ------------------------------------------------------------------ */
 /* Tid                                                                 */
 /* ------------------------------------------------------------------ */
 

@@ -7,6 +7,8 @@ import {
   API_URL,
   HOME_COUNTY,
   HOME_MUNICIPALITIES,
+  MAX_REQUESTS_PER_HOUR,
+  MIN_REQUEST_GAP,
   categorize,
   computeStats,
   countValues,
@@ -24,7 +26,9 @@ import {
   parseDateTime,
   parseEventName,
   parseGps,
+  recentRequests,
   relativeTime,
+  requestDelay,
   toPolisenUrl,
 } from '../js/polisen.js';
 
@@ -281,6 +285,33 @@ test('Östergötland: länsadress och kommuner', () => {
   assert.equal(countyUrl('Skåne län', 'http://127.0.0.1/x'), 'http://127.0.0.1/x?locationname=Sk%C3%A5ne%20l%C3%A4n');
   assert.equal(HOME_MUNICIPALITIES.length, 13);
   assert.ok(HOME_MUNICIPALITIES.includes('Linköping') && HOME_MUNICIPALITIES.includes('Norrköping'));
+});
+
+test('requestDelay följer Polisens regler: 10 sekunder mellan anropen och ett tak per timme', () => {
+  const now = Date.parse('2026-10-11T12:00:00Z');
+  const minute = 60_000;
+  assert.equal(MIN_REQUEST_GAP, 10_000);
+  assert.ok(MAX_REQUESTS_PER_HOUR <= 60);
+
+  assert.equal(requestDelay([], now), 0);
+  assert.equal(requestDelay([now - 3_000], now), 7_000);
+  assert.equal(requestDelay([now - 10_000], now), 0);
+  // Fullt under timmen: vänta tills det äldsta anropet är en timme gammalt.
+  const full = Array.from({ length: MAX_REQUESTS_PER_HOUR }, (_, i) => now - 59 * minute + i * minute);
+  assert.equal(requestDelay(full, now), minute);
+  assert.equal(requestDelay(full.slice(1), now), 0);
+  // Anrop äldre än en timme räknas inte.
+  assert.equal(requestDelay([...full.slice(1), now - 2 * 60 * minute], now), 0);
+});
+
+test('recentRequests tål trasig data i lagringen', () => {
+  const now = Date.parse('2026-10-11T12:00:00Z');
+  assert.deepEqual(recentRequests(null, now), []);
+  assert.deepEqual(recentRequests('x', now), []);
+  assert.deepEqual(recentRequests([now - 5, 'x', null, Number.NaN, now - 9], now), [now - 9, now - 5]);
+  // En tid i framtiden (t.ex. efter att klockan ställts om) får inte låsa sidan.
+  assert.deepEqual(recentRequests([now + 60_000], now), []);
+  assert.equal(requestDelay([now + 60_000], now), 0);
 });
 
 test('countValues sorterar i svensk bokstavsordning (å, ä, ö sist)', () => {

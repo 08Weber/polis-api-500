@@ -56,9 +56,10 @@ index.html            sidan
 style.css             design
 js/polisen.js         tolkar API-svaret (rena funktioner, används även av tester och kontroll)
 js/app.js             hämtning, områden, filter, rendering och notiser
+js/tema.js            sätter ljust/mörkt tema innan sidan ritas
 sw.js                 service worker för notiser
 manifest.webmanifest  för att kunna lägga sidan på hemskärmen
-scripts/              check-api.mjs: kontrollerar att API:et fungerar som sidan förväntar sig
+scripts/              check-api.mjs: kontrollerar API:et, serve.mjs: lokal utvecklingsserver
 test/                 enhetstester med riktiga händelser från API:et
 fonts/                Barlow och Barlow Condensed
 ```
@@ -77,6 +78,10 @@ fonts/                Barlow och Barlow Condensed
   alla webbläsare (Safari) med `new Date()`, så sidan tolkar det själv.
 - API:et kan en kort stund svara `[]` (HTTP 200 med tom lista). Sidan behåller då den senaste datan och
   försöker igen.
+- [Polisens regler för öppna data](https://polisen.se/om-polisen/om-webbplatsen/oppna-data/regler-for-oppna-data/)
+  kräver minst 10 sekunder mellan anropen och högst 60 anrop i timmen. Annars kan API:et svara 429 eller
+  blockera. Sidan håller sig under gränsen även med flera flikar öppna i samma webbläsare: högst 50 anrop
+  i timmen, aldrig tätare än var tionde sekund, och den väntar 15 minuter om API:et ändå svarar 429.
 
 ## Automatisk kontroll
 
@@ -91,7 +96,7 @@ mejl om att körningen misslyckades.
 Kräver Node.js 20 eller senare. Inga beroenden behöver installeras.
 
 ```sh
-npm start           # startar en lokal server på http://localhost:8080
+npm start           # lokal server på http://localhost:8080 (bara den egna datorn)
 npm test            # enhetstester
 npm run check-api   # kontrollerar Polisens API på riktigt
 npm run check-api -- --lan "Östergötlands län"
@@ -99,6 +104,25 @@ npm run check-api -- --lan "Östergötlands län"
 
 Sidan använder JavaScript-moduler, så den måste visas via en server (`npm start`) och inte genom att
 öppna `index.html` direkt som fil.
+
+## Säkerhet
+
+Sidan har ingen server, inga konton, ingen databas och inga hemligheter. Allt körs i besökarens
+webbläsare, och det enda som sparas (i `localStorage`) är tema, notisinställning, vilka händelser som
+redan notifierats, en kopia av senaste API-svaret och tidpunkterna för de senaste anropen.
+
+- Data från API:et behandlas som opålitlig. Den sätts alltid in som text, aldrig som HTML, och länkar
+  släpps bara igenom om de går till `https://polisen.se`.
+- En Content Security Policy i `index.html` tillåter bara sidans egna filer och anrop till
+  `https://polisen.se`. Inga inline-skript är tillåtna, och Trusted Types stoppar HTML-injektion i
+  webbläsare som stöder det. GitHub Pages kan inte skicka egna headers, så policyn ligger i en
+  `<meta>`-tagg. Därför saknas skydd som bara fungerar som header, till exempel `frame-ancestors`.
+- Typsnitt och ikoner ligger i repot. Inga skript eller stilar laddas från andra servrar, och sidan har
+  inga npm-beroenden.
+- GitHub Actions har bara läsrätt, är låsta till exakta commits och uppdateras av Dependabot.
+
+Hittar du ett säkerhetsproblem som inte bör vara offentligt: rapportera det privat under fliken
+Security → Report a vulnerability. Annat går bra som ett vanligt ärende (issue).
 
 ## Licenser
 

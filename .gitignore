@@ -1,0 +1,9 @@
+# Sidan har inga beroenden, men skydda mot att något råkar committas.
+node_modules/
+.env
+.env.*
+*.log
+*.pem
+*.key
+.DS_Store
+Thumbs.db

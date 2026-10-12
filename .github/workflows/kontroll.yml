@@ -11,13 +11,21 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Actions är låsta till en commit (inte en tagg som kan flyttas). Dependabot föreslår uppdateringar.
 jobs:
   tester:
     name: Enhetstester
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
       - run: npm test
@@ -25,12 +33,18 @@ jobs:
   api:
     name: Polisens API
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
       - name: Hela Sverige
         run: node scripts/check-api.mjs --sample 3
+      # Polisens regler: minst 10 sekunder mellan anropen.
+      - name: Paus
+        run: sleep 15
       - name: Östergötland
         run: node scripts/check-api.mjs --lan "Östergötlands län" --sample 3

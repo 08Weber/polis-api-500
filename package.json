@@ -4,7 +4,7 @@
   "description": "Utryckning LKPG – Polisens händelser i Östergötland, live från Polisens öppna API.",
   "type": "module",
   "scripts": {
-    "start": "npx --yes http-server -c-1 -p 8080 .",
+    "start": "node scripts/serve.mjs",
     "test": "node --test",
     "check-api": "node scripts/check-api.mjs"
   },

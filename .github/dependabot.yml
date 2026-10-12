@@ -1,0 +1,10 @@
+version: 2
+updates:
+  # Håller de låsta GitHub Actions uppdaterade.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    # Vänta en vecka efter en ny version, så att en kapad release hinner upptäckas.
+    cooldown:
+      default-days: 7
